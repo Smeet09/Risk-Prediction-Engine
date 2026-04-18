@@ -1,0 +1,43 @@
+# Environments
+.env
+.env.local
+.env.*.local
+venv/
+.venv/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Node.js
+node_modules/
+dist/
+build/
+.npm
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# GIS Data & Artifacts
+Dataset/
+database/data/
+*.tif
+*.tiff
+*.nc
+*.zip
+*.log
+tmp/
+output/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Project specific
+backend/tools/
+scripts/tmp_*
+backend/cols_check.txt
+gis-service/check_*.py
+gis-service/diag_*.py
