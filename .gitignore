@@ -21,6 +21,7 @@ yarn-error.log*
 # GIS Data & Artifacts
 Dataset/
 database/data/
+database/data_dump.sql
 *.tif
 *.tiff
 *.nc

@@ -88,6 +88,8 @@ npm run dev
 
 ---
 
+---
+
 ## 🌍 4. Portability & Moving Data
 
 The system is designed to be mobile.
@@ -97,7 +99,32 @@ The system is designed to be mobile.
 
 ---
 
-## 🛠️ 5. Utility Tools
+## 🔄 5. Syncing Database Data
+
+If you want to transfer your local database state (all tables and data) to another machine:
+
+### A. On your machine (Export)
+1.  Ensure the database container is running (`docker-compose up -d`).
+2.  Run the export script:
+    ```powershell
+    .\scripts\export_db.bat
+    ```
+3.  This creates a file `database\data_dump.sql`.
+4.  Share this file with your team member (via Google Drive, Slack, etc.).
+
+### B. On team member's machine (Import)
+1.  Place the `data_dump.sql` file into the `database/` folder.
+2.  Ensure the database container is running (`docker-compose up -d`).
+3.  Run the import script:
+    ```powershell
+    .\scripts\import_db.bat
+    ```
+    > [!WARNING]
+    > This will overwrite any existing local data in the team member's database.
+
+---
+
+## 🛠️ 6. Utility Tools
 
 Check the `scripts/` and `backend/tools/` directories for administrative scripts:
 - `clean_database.js`: Resets system metadata.
