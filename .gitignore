@@ -27,7 +27,6 @@ manual_data_india/
 uploads/
 data_dump/
 database/data/
-database/*.sql
 database/*.zip
 *.tif
 *.tiff
@@ -45,7 +44,6 @@ database/*.zip
 *.nc
 *.zip
 *.log
-*.sql
 tmp/
 output/
 
@@ -61,4 +59,4 @@ scripts/tmp_*
 backend/cols_check.txt
 gis-service/check_*.py
 gis-service/diag_*.py
-*.sql 
+
