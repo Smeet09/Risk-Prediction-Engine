@@ -6,7 +6,8 @@ const AuthPage = React.lazy(() => import("./pages/AuthPage"));
 const ProjectHub = React.lazy(() => import("./pages/ProjectHub"));
 const SusceptibilityModule = React.lazy(() => import("./pages/SusceptibilityModule"));
 const RainfallModule = React.lazy(() => import("./pages/RainfallModule"));
-const AdminDashboard = React.lazy(() => import("./pages/AdminDashboard"));
+const AdminDashboard  = React.lazy(() => import("./pages/AdminDashboard"));
+const DynamicModule   = React.lazy(() => import("./pages/DynamicModule"));
 
 const Loader = () => (
   <div style={{ height: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f8f8f9" }}>
@@ -30,6 +31,7 @@ export default function App() {
           <Route path="/hub" element={<PrivateRoute><ProjectHub /></PrivateRoute>} />
           <Route path="/susceptibility" element={<PrivateRoute><SusceptibilityModule /></PrivateRoute>} />
           <Route path="/rainfall" element={<PrivateRoute><RainfallModule /></PrivateRoute>} />
+          <Route path="/dynamic" element={<PrivateRoute><DynamicModule /></PrivateRoute>} />
           <Route path="/admin" element={<PrivateRoute adminOnly><AdminDashboard /></PrivateRoute>} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

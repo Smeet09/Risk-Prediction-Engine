@@ -59,6 +59,7 @@ app.use("/api/boundaries",      require("./routes/boundaries"));
 app.use("/api/manual",          require("./routes/manual").router);
 app.use("/api/disasters",       require("./routes/disasters"));
 app.use("/api/weather",         require("./routes/weather"));
+app.use("/api/dynamic",         require("./routes/dynamic"));
 
 // ─── Health check ─────────────────────────────────────────────────────────────
 app.get("/health", (_req, res) => res.json({

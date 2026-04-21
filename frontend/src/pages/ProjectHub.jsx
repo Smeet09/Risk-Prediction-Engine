@@ -2,6 +2,38 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { gsap } from "gsap";
 import { TerrainCard, RainSphereCard } from "../components/three/ModuleCards3D";
+
+/* Simple animated SVG icon for Dynamic module (no Three.js dep needed) */
+function DynamicIcon({ hovered }) {
+  return (
+    <div style={{
+      width: "100%", height: "100%",
+      display: "flex", alignItems: "center", justifyContent: "center",
+      background: hovered
+        ? "rgba(255,255,255,0.1)"
+        : "linear-gradient(135deg, #667eea22, #764ba222)",
+      borderRadius: 18, position: "relative", overflow: "hidden",
+    }}>
+      <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+        <circle cx="40" cy="40" r="30"
+          stroke={hovered ? "rgba(255,255,255,0.4)" : "#667eea44"}
+          strokeWidth="1.5" strokeDasharray="4 3"
+          style={{ animation: "spin 12s linear infinite" }} />
+        <path d="M20 52 Q32 28 40 36 Q48 44 60 20"
+          stroke={hovered ? "#fff" : "#667eea"}
+          strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+        <circle cx="20" cy="52" r="3.5" fill={hovered ? "#fff" : "#667eea"} />
+        <circle cx="40" cy="36" r="3.5" fill={hovered ? "#ffe066" : "#f9c74f"} />
+        <circle cx="60" cy="20" r="4"   fill={hovered ? "#ff6b6b" : "#f3722c"} />
+        <rect x="34" y="54" width="12" height="12" rx="3"
+          fill={hovered ? "rgba(255,255,255,0.2)" : "#f0f0f8"}
+          stroke={hovered ? "rgba(255,255,255,0.5)" : "#667eea55"} strokeWidth="1"/>
+        <text x="40" y="63" textAnchor="middle" fontSize="8"
+          fill={hovered ? "#fff" : "#667eea"} fontWeight="700">AI</text>
+      </svg>
+    </div>
+  );
+}
 import useStore from "../store/useStore";
 
 const MODULES = [
@@ -24,6 +56,16 @@ const MODULES = [
     route: "/rainfall",
     color: "#0071e3",
     Icon: RainSphereCard,
+  },
+  {
+    id: "dynamic",
+    label: "Dynamic Risk",
+    tag: "MODULE C",
+    title: "Physics AI Engine",
+    desc: "Date-wise dynamic risk prediction for flood & landslide. Fuses 10-day weather, susceptibility, and LULC with TOPMODEL + SCS-CN physics.",
+    route: "/dynamic",
+    color: "#5856d6",
+    Icon: DynamicIcon,
   },
 ];
 
@@ -235,7 +277,7 @@ export default function ProjectHub() {
           {[
             { label: "Regions Indexed", value: "4+" },
             { label: "Disaster Types", value: "5" },
-            { label: "Data Modules", value: "4" },
+            { label: "Data Modules", value: "5" },
           ].map((s) => (
             <div key={s.label} style={{
               background: "#fff", padding: "28px 32px", textAlign: "center"

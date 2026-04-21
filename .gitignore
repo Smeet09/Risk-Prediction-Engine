@@ -20,13 +20,32 @@ yarn-error.log*
 
 # GIS Data & Artifacts
 Dataset/
+flood/
+India/
+landslide/
+manual_data_india/
+uploads/
+data_dump/
 database/data/
-database/data_dump.sql
+database/*.sql
+database/*.zip
 *.tif
 *.tiff
+*.shp
+*.shx
+*.dbf
+*.prj
+*.cpg
+*.qpj
+*.sbn
+*.sbx
+*.xml
+*.fix
+*.atx
 *.nc
 *.zip
 *.log
+*.sql
 tmp/
 output/
 

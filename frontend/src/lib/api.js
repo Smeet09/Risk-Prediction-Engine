@@ -127,3 +127,17 @@ export const getRainfallData = (region_id, date) =>
   api.get("/rainfall/data", { params: { region_id, date } }).then((r) => r.data);
 export const fetchEra5 = (region_id, date) =>
   api.post("/rainfall/fetch", { region_id, date }).then((r) => r.data);
+
+// ─── Dynamic Risk Prediction ──────────────────────────────────────────────────
+export const triggerDynamicPrediction = (region_id, disaster_code, target_date) =>
+  api.post("/dynamic/predict", { region_id, disaster_code, target_date }).then((r) => r.data);
+
+export const getDynamicResult = (region_id, disaster_code, target_date) =>
+  api.get(`/dynamic/result/${region_id}/${disaster_code}/${target_date}`).then((r) => r.data);
+
+export const getDynamicHistory = (region_id, disaster_code) =>
+  api.get(`/dynamic/history/${region_id}/${disaster_code}`).then((r) => r.data);
+
+export const getDynamicAvailableDates = (region_id, disaster_code) =>
+  api.get(`/dynamic/available-dates/${region_id}/${disaster_code}`).then((r) => r.data);
+
