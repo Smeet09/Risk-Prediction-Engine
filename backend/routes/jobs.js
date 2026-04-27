@@ -7,6 +7,39 @@ const { v4: uuidv4 } = require("uuid");
 const fs = require("fs");
 const path = require("path");
 
+// PATCH /api/jobs/:id/progress — external progress update (e.g. from GIS service)
+router.patch("/:id/progress", async (req, res) => {
+  const { status, progress, log } = req.body;
+  const jobId = req.params.id;
+
+  try {
+    // Update DB
+    const updateParts = [];
+    const values = [];
+    if (status) { updateParts.push("status=$" + (values.length + 1)); values.push(status); }
+    if (progress !== undefined) { updateParts.push("progress=$" + (values.length + 1)); values.push(progress); }
+    if (log !== undefined) { updateParts.push("log=$" + (values.length + 1)); values.push(log); }
+    
+    if (updateParts.length > 0) {
+      values.push(jobId);
+      await pool.query(
+        `UPDATE jobs SET ${updateParts.join(", ")}, updated_at=NOW() WHERE id=$${values.length}`,
+        values
+      );
+    }
+
+    // Broadcast to WebSocket clients
+    if (req.app.locals.broadcastJob) {
+      req.app.locals.broadcastJob(jobId, { status, progress, log, updated_at: new Date() });
+    }
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error(`[JobsNotify] Error updating job ${jobId}:`, err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // GET /api/jobs/:id — get job status
 router.get("/:id", protect, async (req, res) => {
   const { rows } = await pool.query(
@@ -106,11 +139,11 @@ async function triggerSusceptibility(app, jobId, regionId, disasterType) {
     // Store result reference
     if (result.geojson) {
       await pool.query(
-        `INSERT INTO susceptibility_results (region_id, disaster_type, final_geojson, hazard_geojson, exposure_geojson, vuln_geojson)
-         VALUES ($1,$2,$3,$4,$5,$6)
+        `INSERT INTO susceptibility_results (region_id, disaster_type, tif_path, status, final_geojson, hazard_geojson, exposure_geojson, vuln_geojson)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
          ON CONFLICT DO NOTHING`,
         [
-          regionId, disasterType,
+          regionId, disasterType, result.tif_path, "done",
           JSON.stringify(result.geojson?.final),
           JSON.stringify(result.geojson?.hazard),
           JSON.stringify(result.geojson?.exposure),
@@ -180,24 +213,38 @@ router.post("/sync-integrity", protect, adminOnly, async (req, res) => {
     let correctedCount = 0;
 
     for (const r of regions) {
-      const destDir = path.join(
-        DATA_ROOT,
-        _safe(r.country),
-        _safe(r.state),
-        r.district ? _safe(r.district) : "_state_level",
-        "dem_features"
-      );
-
-      const exists = fs.existsSync(destDir);
-      console.log(`[Sync-Integrity] Checking path: ${destDir} - Exists: ${exists}`);
-
-      // If folder is gone, reset statuses
+      // Create a few candidates for the folder name
+      const exactFolder = r.district ? _safe(r.district) : "_state_level";
+      
+      const primaryPath = path.join(DATA_ROOT, _safe(r.country), _safe(r.state), exactFolder, "dem_features");
+      
+      // Lenient check: Try exact, underscored, and common variations
+      let exists = fs.existsSync(primaryPath);
+      
       if (!exists) {
+         // Fallback: Check if the state folder exists under the original name without underscore cleaning
+         const altPath = path.join(DATA_ROOT, r.country, r.state, exactFolder, "dem_features");
+         exists = fs.existsSync(altPath);
+      }
+
+      console.log(`[Sync-Integrity] Checking path: ${primaryPath} - Exists: ${exists}`);
+
+      if (exists) {
+        // AUTO-RESTORE: If folder exists, it means DEM and Terrain are likely ready
+        console.log(`[Sync-Integrity] Data found for region ${r.id}. Restoring Ready status.`);
+        await pool.query(
+          `UPDATE data_inventory 
+           SET dem_ready=TRUE, terrain_ready=TRUE, topo_ready=TRUE, updated_at=NOW()
+           WHERE region_id=$1`,
+          [r.id]
+        );
+      } else {
+        // RESET: If folder is gone, reset statuses
         console.warn(`[Sync-Integrity] Data missing for region ${r.id} (${r.state}). Resetting status.`);
         const { rowCount } = await pool.query(
           `UPDATE data_inventory 
-           SET dem_ready=FALSE, terrain_ready=FALSE, manual_india_ready=FALSE, susceptibility_ready=FALSE, updated_at=NOW()
-           WHERE region_id=$1 AND (dem_ready=TRUE OR terrain_ready=TRUE OR susceptibility_ready=TRUE)`,
+           SET dem_ready=FALSE, terrain_ready=FALSE, topo_ready=FALSE, susceptibility_ready=FALSE, updated_at=NOW()
+           WHERE region_id=$1 AND (dem_ready=TRUE OR terrain_ready=TRUE OR topo_ready=TRUE OR susceptibility_ready=TRUE)`,
           [r.id]
         );
         if (rowCount > 0) correctedCount++;

@@ -5,17 +5,19 @@ import { getRegionsFlat, getJobs, getSusceptibilityList, syncJobs, syncIntegrity
 import DemUpload from "../components/admin/DemUpload";
 import ManualDataUpload from "../components/admin/ManualDataUpload";
 import SusceptibilityMapping from "../components/admin/SusceptibilityMapping";
+import DynamicMapping from "../components/admin/DynamicMapping";
 import DisasterManager from "../components/admin/DisasterManager";
 import BoundaryImporter from "../components/admin/BoundaryImporter";
 import WeatherDownload from "../components/admin/WeatherDownload";
 
 const NAV_ITEMS = [
-  { id: "overview",       label: "Overview",               icon: "◈" },
-  { id: "dem",            label: "DEM Upload",             icon: "⛰️" },
-  { id: "manual",         label: "Manual Data (India)",    icon: "🌏" },
-  { id: "weather",        label: "Weather Download",       icon: "🌤️" },
-  { id: "susceptibility", label: "Susceptibility Gen.",    icon: "⚡" },
-  { id: "disasters",      label: "Disaster Types",         icon: "🔧" },
+  { id: "overview", label: "Overview", icon: "◈" },
+  { id: "dem", label: "DEM Upload", icon: "⛰️" },
+  { id: "manual", label: "Manual Data (India)", icon: "🌏" },
+  { id: "weather", label: "Weather Download", icon: "🌤️" },
+  { id: "susceptibility", label: "Susceptibility Gen.", icon: "⚡" },
+  { id: "dynamic", label: "Dynamic Risk Gen.", icon: "⚙️" },
+  { id: "disasters", label: "Disaster Types", icon: "🔧" },
 ];
 
 const CONTEXT = {
@@ -73,19 +75,27 @@ const CONTEXT = {
       { n: "✓", title: "Custom Disasters", desc: "Add new types with your own icon, color, and default weights." },
     ]
   },
+  dynamic: {
+    title: "Dynamic Risk Tips",
+    steps: [
+      { n: "✓", title: "Prerequisites", desc: "Susceptibility map must be generated first. Weather data for target date must exist." },
+      { n: "✓", title: "Target Date", desc: "Select a date for which weather data has been downloaded." },
+      { n: "✓", title: "Physics Engine", desc: "Runs physics-based models using high-resolution susceptibility maps." },
+    ]
+  },
 };
 
 function OverviewDashboard({ regions, jobs, onRefresh }) {
-  const total    = regions.length;
+  const total = regions.length;
   const demReady = regions.filter(r => r.dem_ready).length;
   const terrainReady = regions.filter(r => r.terrain_ready).length;
-  const susc     = regions.filter(r => r.susceptibility_ready).length;
+  const susc = regions.filter(r => r.susceptibility_ready).length;
 
   const stats = [
-    { label: "Total Regions",     value: total,       color: "#000" },
-    { label: "DEM Processed",     value: demReady,    color: "#5856d6" },
-    { label: "Terrain Classified",value: terrainReady,color: "#0071e3" },
-    { label: "Maps Generated",    value: susc,        color: "#34c759" },
+    { label: "Total Regions", value: total, color: "#000" },
+    { label: "DEM Processed", value: demReady, color: "#5856d6" },
+    { label: "Terrain Classified", value: terrainReady, color: "#0071e3" },
+    { label: "Maps Generated", value: susc, color: "#34c759" },
   ];
 
   const recentJobs = (jobs || []).slice(0, 6);
@@ -105,7 +115,7 @@ function OverviewDashboard({ regions, jobs, onRefresh }) {
     if (!window.confirm("Perform a deep sync? This will check GIS jobs and verify all physical files on disk actually exist.")) return;
     try {
       const resSync = await syncJobs();
-      const resInt  = await syncIntegrity();
+      const resInt = await syncIntegrity();
       alert(`Sync Complete!\n\n- Active GIS Jobs: ${resSync.active_in_gis}\n- Cleaned Dead Jobs: ${resSync.corrected_dead_jobs}\n- Desynced Regions Fixed: ${resInt.corrected_regions}`);
       onRefresh?.();
     } catch (e) {
@@ -221,12 +231,12 @@ export default function AdminDashboard() {
   const navigate = useNavigate();
   const { user, logout } = useStore();
   const [activeModule, setActiveModule] = useState("overview");
-  const [regions, setRegions]   = useState([]);
-  const [jobs,    setJobs]      = useState([]);
+  const [regions, setRegions] = useState([]);
+  const [jobs, setJobs] = useState([]);
 
   const fetchData = () => {
-    getRegionsFlat().then(d => setRegions(d.regions || [])).catch(() => {});
-    getJobs().then(d        => setJobs(d.jobs || [])).catch(()         => {});
+    getRegionsFlat().then(d => setRegions(d.regions || [])).catch(() => { });
+    getJobs().then(d => setJobs(d.jobs || [])).catch(() => { });
   };
 
   useEffect(() => {
@@ -253,21 +263,23 @@ export default function AdminDashboard() {
         borderBottom: "1px solid #e5e5e7", zIndex: 100
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-          <div style={{ width: 36, height: 36, borderRadius: 10, background: "#000",
-            display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
-                stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+          <div style={{
+            width: 44, height: 44, borderRadius: 10, background: "#fff",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.06)"
+          }}>
+            <img src="/bisag_logo.png" alt="BISAG Logo" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: 10 }} />
           </div>
-          <span style={{ fontWeight: 700, fontSize: 16, letterSpacing: "-0.02em" }}>Aether Admin</span>
+          <span style={{ fontWeight: 700, fontSize: 16, letterSpacing: "-0.02em" }}>Prediction Engine Admin</span>
           <div style={{ width: 1, height: 20, background: "#e5e5e7" }} />
-          <span style={{ fontSize: 13, color: "#666" }}>Control Panel v2</span>
+          <span style={{ fontSize: 13, color: "#666" }}>Control Panel</span>
         </div>
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
           <button className="btn btn-secondary btn-sm" onClick={() => navigate("/hub")}>← Hub</button>
-          <div style={{ display: "flex", alignItems: "center", gap: 10,
-            padding: "7px 14px", borderRadius: 50, background: "#000", color: "#fff" }}>
+          <div style={{
+            display: "flex", alignItems: "center", gap: 10,
+            padding: "7px 14px", borderRadius: 50, background: "#000", color: "#fff"
+          }}>
             <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.08em" }}>ADMIN</span>
             <span style={{ fontSize: 13 }}>{user?.name || user?.email}</span>
           </div>
@@ -303,13 +315,15 @@ export default function AdminDashboard() {
           <div className="divider" style={{ margin: "16px 0" }} />
           <p className="t-label" style={{ marginBottom: 8, paddingLeft: 12 }}>STATUS</p>
           {[
-            { label: "Regions",            value: regions.length },
-            { label: "DEM Processed",      value: regions.filter(r => r.dem_ready).length },
+            { label: "Regions", value: regions.length },
+            { label: "DEM Processed", value: regions.filter(r => r.dem_ready).length },
             { label: "Terrain Classified", value: regions.filter(r => r.terrain_ready).length },
-            { label: "Maps Generated",     value: regions.filter(r => r.susceptibility_ready).length },
+            { label: "Maps Generated", value: regions.filter(r => r.susceptibility_ready).length },
           ].map(s => (
-            <div key={s.label} style={{ padding: "8px 14px",
-              display: "flex", justifyContent: "space-between", fontSize: 13 }}>
+            <div key={s.label} style={{
+              padding: "8px 14px",
+              display: "flex", justifyContent: "space-between", fontSize: 13
+            }}>
               <span style={{ color: "#666" }}>{s.label}</span>
               <span style={{ fontWeight: 700 }}>{s.value}</span>
             </div>
@@ -333,6 +347,9 @@ export default function AdminDashboard() {
           <div style={{ display: activeModule === "susceptibility" ? "block" : "none" }}>
             <SusceptibilityMapping regionsFlat={regions} jobs={jobs} />
           </div>
+          <div style={{ display: activeModule === "dynamic" ? "block" : "none" }}>
+            <DynamicMapping regionsFlat={regions} jobs={jobs} />
+          </div>
           <div style={{ display: activeModule === "disasters" ? "block" : "none" }}>
             <DisasterManager />
           </div>
@@ -344,8 +361,10 @@ export default function AdminDashboard() {
           padding: "28px 22px", overflowY: "auto"
         }}>
           <p className="t-label" style={{ marginBottom: 16 }}>INSTRUCTIONS</p>
-          <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 16,
-            letterSpacing: "-0.02em" }}>{ctx.title}</h3>
+          <h3 style={{
+            fontSize: 16, fontWeight: 700, marginBottom: 16,
+            letterSpacing: "-0.02em"
+          }}>{ctx.title}</h3>
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             {ctx.steps.map((step, i) => (
               <div key={i} style={{ display: "flex", gap: 14 }}>

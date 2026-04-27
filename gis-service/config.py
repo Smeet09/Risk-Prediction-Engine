@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     CDS_KEY:      str = "c8969bb3-79bf-4a62-951e-c0e2d6c1788d"
     HOST:         str = "0.0.0.0"
     PORT:         int = 8000
+    BACKEND_URL:  str = "http://localhost:4000"
     DEM_STUB_MODE:  bool = True
     SUSC_STUB_MODE: bool = False   # ← Production: real scripts are now used
 

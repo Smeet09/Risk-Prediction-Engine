@@ -1,0 +1,14 @@
+# =============================================================
+# Aether-Disaster — Root Environment Variables
+# Copy this file to .env and fill in your values
+# =============================================================
+
+# PostgreSQL (used by Docker Compose)
+POSTGRES_USER=aether
+POSTGRES_PASSWORD=aether_secret
+POSTGRES_DB=aether_disaster
+POSTGRES_PORT=5432
+
+# Data storage root (fully portable — change this to move the project)
+# Default resolves to <project_root>/database
+DATA_ROOT=./database

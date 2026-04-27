@@ -57,6 +57,21 @@ export const getTalukas         = (state, district) =>
   api.get(`/boundaries/talukas/${encodeURIComponent(state)}/${encodeURIComponent(district)}`).then((r) => r.data);
 export const getVillages        = (state, district, taluka) =>
   api.get(`/boundaries/villages/${encodeURIComponent(state)}/${encodeURIComponent(district)}/${encodeURIComponent(taluka)}`).then((r) => r.data);
+
+export const getDistrictGeoJSON = (state) =>
+  api.get(`/boundaries/geojson/districts/${encodeURIComponent(state)}`).then((r) => r.data);
+export const getTalukaGeoJSON   = (state, district) =>
+  api.get(`/boundaries/geojson/talukas/${encodeURIComponent(state)}/${encodeURIComponent(district)}`).then((r) => r.data);
+export const getVillageGeoJSON  = (state, district, taluka) =>
+  api.get(`/boundaries/geojson/villages/${encodeURIComponent(state)}/${encodeURIComponent(district)}/${encodeURIComponent(taluka)}`).then((r) => r.data);
+
+export const getTalukaGeoJSONStateWide = (state) =>
+  api.get(`/boundaries/geojson/talukas/${encodeURIComponent(state)}`).then((r) => r.data);
+export const getVillageGeoJSONStateWide = (state) =>
+  api.get(`/boundaries/geojson/villages/${encodeURIComponent(state)}`).then((r) => r.data);
+export const getVillageGeoJSONDistrictWide = (state, district) =>
+  api.get(`/boundaries/geojson/villages/${encodeURIComponent(state)}/${encodeURIComponent(district)}`).then((r) => r.data);
+
 export const importBoundaries   = (opts = {}) =>
   api.post("/boundaries/import", opts, { responseType: "text", timeout: 30 * 60 * 1000 }).then((r) => r.data);
 

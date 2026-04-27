@@ -15,27 +15,46 @@ async function cleanDatabase() {
     console.log("==========================================");
 
     try {
-        console.log("\n[1/3] Wiping all operational data...");
-        // TRUNCATE empties the tables but keeps schema.
-        // CASCADE ensures dependent tables empty as well.
-        // We explicitly EXCLUDE boundary files so they remain available for mapping.
+        console.log("\n[1/3] Wiping operational data (preserving weather/manual indices)...");
+        
+        // 1. Wipe jobs EXCEPT weather and manual import history
+        await pool.query(`DELETE FROM jobs WHERE module NOT IN ('weather', 'manual_import', 'manual_data')`);
+        
+        // 2. Wipe ONLY operational results (No Cascade on master tables)
         await pool.query(`
             TRUNCATE TABLE 
-                jobs, 
-                data_inventory, 
                 rainfall_timeseries,
                 susceptibility_results,
                 dem_uploads,
                 topographic_features,
                 terrain_classifications,
-                weather_data,
-                regions,
-                users,
+                dynamic_risk_results,
                 susceptibility_flood,
-                susceptibility_landslide
-            RESTART IDENTITY CASCADE;
+                susceptibility_landslide,
+                dynamic_risk_flood,
+                dynamic_risk_landslide
+            RESTART IDENTITY;
         `);
-        console.log("✅ Operational database tables cleaned.");
+
+        // 3. Reset Inventory but SELF-HEAL based on persisting tables (Weather & Manual)
+        console.log("   -> Self-healing data inventory status...");
+        
+        // First reset local region flags
+        await pool.query(`
+            UPDATE data_inventory 
+            SET dem_ready = FALSE, 
+                terrain_ready = FALSE, 
+                topo_ready = FALSE,
+                susceptibility_ready = FALSE
+        `);
+
+        // Sync global manual readiness (if all 5 layers exist in manual_data_india)
+        const { rows: manualCheck } = await pool.query(`SELECT COUNT(*)::int FROM manual_data_india`);
+        if (manualCheck[0].count >= 5) {
+            await pool.query(`UPDATE data_inventory SET manual_india_ready = TRUE`);
+        }
+
+        console.log("✅ Operational database tables cleaned (Weather & Manual logs preserved).");
 
         console.log("\n[2/3] Re-injecting default administrator account...");
 
@@ -54,6 +73,7 @@ async function cleanDatabase() {
 
         console.log("\n[3/3] Preserving large master data boundaries...");
         console.log("✅ States, Districts, Talukas, and Villages boundary tables kept intact.");
+        console.log("✅ India-wide Manual datasets (River, Fault, Coastal, LULC, Soil) kept intact.");
 
         console.log("\n🎉 Database cleanup complete. Everything is neat and clean for handover!");
 

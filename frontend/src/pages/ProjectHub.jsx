@@ -21,13 +21,13 @@ function DynamicIcon({ hovered }) {
           style={{ animation: "spin 12s linear infinite" }} />
         <path d="M20 52 Q32 28 40 36 Q48 44 60 20"
           stroke={hovered ? "#fff" : "#667eea"}
-          strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+          strokeWidth="2.5" strokeLinecap="round" fill="none" />
         <circle cx="20" cy="52" r="3.5" fill={hovered ? "#fff" : "#667eea"} />
         <circle cx="40" cy="36" r="3.5" fill={hovered ? "#ffe066" : "#f9c74f"} />
-        <circle cx="60" cy="20" r="4"   fill={hovered ? "#ff6b6b" : "#f3722c"} />
+        <circle cx="60" cy="20" r="4" fill={hovered ? "#ff6b6b" : "#f3722c"} />
         <rect x="34" y="54" width="12" height="12" rx="3"
           fill={hovered ? "rgba(255,255,255,0.2)" : "#f0f0f8"}
-          stroke={hovered ? "rgba(255,255,255,0.5)" : "#667eea55"} strokeWidth="1"/>
+          stroke={hovered ? "rgba(255,255,255,0.5)" : "#667eea55"} strokeWidth="1" />
         <text x="40" y="63" textAnchor="middle" fontSize="8"
           fill={hovered ? "#fff" : "#667eea"} fontWeight="700">AI</text>
       </svg>
@@ -41,7 +41,7 @@ const MODULES = [
     id: "susceptibility",
     label: "Susceptibility",
     tag: "MODULE A",
-    title: "3D AHP Mapping",
+    title: "AHP Mapping",
     desc: "Analyze hazard, exposure, and vulnerability layers with AI-powered AHP weighting across any region.",
     route: "/susceptibility",
     color: "#000",
@@ -52,7 +52,7 @@ const MODULES = [
     label: "Rainfall & Weather",
     tag: "MODULE B",
     title: "ERA5 Data Engine",
-    desc: "Visualize dynamic rainfall patterns with 3D extruded heatmaps and 24-hour temporal scrubbing.",
+    desc: "Visualize dynamic rainfall patterns with 24-hour temporal scrubbing.",
     route: "/rainfall",
     color: "#0071e3",
     Icon: RainSphereCard,
@@ -197,15 +197,13 @@ export default function ProjectHub() {
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
           <div style={{
-            width: 36, height: 36, borderRadius: 10, background: "#000",
-            display: "flex", alignItems: "center", justifyContent: "center"
+            width: 44, height: 44, borderRadius: 10, background: "#fff",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.06)"
           }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
-                stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            <img src="/bisag_logo.png" alt="BISAG Logo" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: 10 }} />
           </div>
-          <span style={{ fontWeight: 700, fontSize: 16, letterSpacing: "-0.02em" }}>Aether</span>
+          <span style={{ fontWeight: 700, fontSize: 16, letterSpacing: "-0.02em" }}>Prediction Engine</span>
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
@@ -236,11 +234,11 @@ export default function ProjectHub() {
       </header>
 
       {/* Hero Section */}
-      <div style={{ maxWidth: 900, margin: "0 auto", padding: "80px 48px 48px", perspective: "1000px" }}>
+      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "80px 48px 48px", perspective: "1000px" }}>
         <div ref={heroRef} style={{ textAlign: "center", marginBottom: 72 }}>
           <p className="t-label" style={{ marginBottom: 20 }}>DISASTER MANAGEMENT PLATFORM</p>
           <h1 className="t-hero" style={{ fontSize: "clamp(48px,6vw,80px)", marginBottom: 20 }}>
-            Aether Intelligence
+            Prediction Engine
           </h1>
           <p style={{ fontSize: 18, color: "#666", maxWidth: 560, margin: "0 auto", lineHeight: 1.7 }}>
             A geospatial analysis engine for susceptibility modeling and dynamic rainfall intelligence.
@@ -260,7 +258,7 @@ export default function ProjectHub() {
         {/* Module Cards */}
         <div ref={cardsRef} style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+          gridTemplateColumns: "repeat(3, 1fr)",
           gap: 20,
           perspective: "800px"
         }}>

@@ -79,6 +79,156 @@ router.get("/villages/:state/:district/:taluka", protect, async (req, res) => {
   res.json({ villages: rows.map(r => ({ name: r.village, centroid: r.centroid ? JSON.parse(r.centroid) : null })) });
 });
 
+// ─── GEOJSON BOUNDARIES FOR MAP STACKING ──────────────────────────────────────
+
+// GET /api/boundaries/geojson/districts/:state
+router.get("/geojson/districts/:state", protect, async (req, res) => {
+  const state = req.params.state.replace(/I+$/, ""); // Handle DELHI/DELHII
+  const { rows } = await pool.query(
+    `SELECT jsonb_build_object(
+      'type', 'FeatureCollection',
+      'features', jsonb_agg(features.feature)
+    ) AS geojson
+    FROM (
+      SELECT jsonb_build_object(
+        'type', 'Feature',
+        'geometry', ST_AsGeoJSON(geom)::jsonb,
+        'properties', jsonb_build_object('name', name, 'level', 'district')
+      ) AS feature
+      FROM districts_boundaries
+      WHERE state_name ILIKE '%' || $1 || '%'
+    ) AS features`,
+    [state]
+  );
+  res.json(rows[0].geojson || { type: "FeatureCollection", features: [] });
+});
+
+// GET /api/boundaries/geojson/talukas/:state (State-wide)
+router.get("/geojson/talukas/:state", protect, async (req, res) => {
+  const state = req.params.state.replace(/I+$/, "");
+  const { rows } = await pool.query(
+    `SELECT jsonb_build_object(
+      'type', 'FeatureCollection',
+      'features', jsonb_agg(features.feature)
+    ) AS geojson
+    FROM (
+      SELECT jsonb_build_object(
+        'type', 'Feature',
+        'geometry', ST_AsGeoJSON(ST_Simplify(geom, 0.0005))::jsonb,
+        'properties', jsonb_build_object('name', name, 'level', 'taluka')
+      ) AS feature
+      FROM talukas_boundaries
+      WHERE state_name ILIKE '%' || $1 || '%'
+      LIMIT 2000
+    ) AS features`,
+    [state]
+  );
+  res.json(rows[0].geojson || { type: "FeatureCollection", features: [] });
+});
+
+// GET /api/boundaries/geojson/villages/:state (State-wide)
+router.get("/geojson/villages/:state", protect, async (req, res) => {
+  const state = req.params.state.replace(/I+$/, "");
+  const { rows } = await pool.query(
+    `SELECT jsonb_build_object(
+      'type', 'FeatureCollection',
+      'features', jsonb_agg(features.feature)
+    ) AS geojson
+    FROM (
+      SELECT jsonb_build_object(
+        'type', 'Feature',
+        'geometry', ST_AsGeoJSON(ST_Simplify(geom, 0.0001))::jsonb,
+        'properties', jsonb_build_object('name', name, 'level', 'village')
+      ) AS feature
+      FROM villages_boundaries
+      WHERE state_name ILIKE '%' || $1 || '%'
+      LIMIT 5000
+    ) AS features`,
+    [state]
+  );
+  res.json(rows[0].geojson || { type: "FeatureCollection", features: [] });
+});
+
+// GET /api/boundaries/geojson/talukas/:state/:district
+router.get("/geojson/talukas/:state/:district", protect, async (req, res) => {
+  const state = req.params.state.replace(/I+$/, "");
+  const district = req.params.district;
+  const { rows } = await pool.query(
+    `SELECT jsonb_build_object(
+      'type', 'FeatureCollection',
+      'features', jsonb_agg(features.feature)
+    ) AS geojson
+    FROM (
+      SELECT jsonb_build_object(
+        'type', 'Feature',
+        'geometry', ST_AsGeoJSON(geom)::jsonb,
+        'properties', jsonb_build_object('name', name, 'level', 'taluka')
+      ) AS feature
+      FROM talukas_boundaries
+      WHERE state_name ILIKE '%' || $1 || '%'
+        AND district_name ILIKE '%' || $2 || '%'
+    ) AS features`,
+    [state, district]
+  );
+  res.json(rows[0].geojson || { type: "FeatureCollection", features: [] });
+});
+
+// GET /api/boundaries/geojson/villages/:state/:district  (district-scoped, no taluka needed)
+router.get("/geojson/villages/:state/:district", protect, async (req, res) => {
+  const state    = req.params.state.replace(/I+$/, "");
+  const district = req.params.district;
+  const { rows } = await pool.query(
+    `SELECT jsonb_build_object(
+      'type', 'FeatureCollection',
+      'features', jsonb_agg(features.feature)
+    ) AS geojson
+    FROM (
+      SELECT jsonb_build_object(
+        'type', 'Feature',
+        'geometry', ST_AsGeoJSON(ST_Simplify(geom, 0.0001))::jsonb,
+        'properties', jsonb_build_object(
+          'name', name,
+          'level', 'village',
+          'taluka', taluka_name,
+          'district', district_name
+        )
+      ) AS feature
+      FROM villages_boundaries
+      WHERE state_name    ILIKE '%' || $1 || '%'
+        AND district_name ILIKE '%' || $2 || '%'
+      LIMIT 3000
+    ) AS features`,
+    [state, district]
+  );
+  res.json(rows[0].geojson || { type: "FeatureCollection", features: [] });
+});
+
+// GET /api/boundaries/geojson/villages/:state/:district/:taluka
+router.get("/geojson/villages/:state/:district/:taluka", protect, async (req, res) => {
+  const state = req.params.state.replace(/I+$/, "");
+  const district = req.params.district;
+  const taluka = req.params.taluka;
+  const { rows } = await pool.query(
+    `SELECT jsonb_build_object(
+      'type', 'FeatureCollection',
+      'features', jsonb_agg(features.feature)
+    ) AS geojson
+    FROM (
+      SELECT jsonb_build_object(
+        'type', 'Feature',
+        'geometry', ST_AsGeoJSON(geom)::jsonb,
+        'properties', jsonb_build_object('name', name, 'level', 'village')
+      ) AS feature
+      FROM villages_boundaries
+      WHERE state_name ILIKE '%' || $1 || '%'
+        AND district_name ILIKE '%' || $2 || '%'
+        AND taluka_name ILIKE '%' || $3 || '%'
+    ) AS features`,
+    [state, district, taluka]
+  );
+  res.json(rows[0].geojson || { type: "FeatureCollection", features: [] });
+});
+
 // ─── POST /api/boundaries/import ──────────────────────────────────────────────
 // Admin-only one-time importer. Runs import_boundaries.py as a child process.
 // Note: Kept for legacy local dataset mounting if ever needed.

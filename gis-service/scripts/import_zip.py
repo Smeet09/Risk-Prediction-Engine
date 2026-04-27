@@ -80,16 +80,16 @@ def import_level(conn, gdf, level, verbose=True):
         batch = rows[i:i + BATCH]
         try:
             if level == "state":
-                query = f"INSERT INTO {table_name} (name, geom, centroid, bbox, source_fid) VALUES (%s, ST_Multi(ST_GeomFromText(%s, 4326)), ST_GeomFromText(%s, 4326), ST_GeomFromText(%s, 4326), %s) ON CONFLICT DO NOTHING"
+                query = f"INSERT INTO {table_name} (name, geom, centroid, bbox, source_fid) VALUES (%s, ST_Multi(ST_Force2D(ST_GeomFromText(%s, 4326))), ST_GeomFromText(%s, 4326), ST_GeomFromText(%s, 4326), %s) ON CONFLICT DO NOTHING"
                 bd = [(b[1], b[5], b[6], b[7], b[8]) for b in batch]
             elif level == "district":
-                query = f"INSERT INTO {table_name} (name, state_name, geom, centroid, bbox, source_fid) VALUES (%s, %s, ST_Multi(ST_GeomFromText(%s, 4326)), ST_GeomFromText(%s, 4326), ST_GeomFromText(%s, 4326), %s) ON CONFLICT DO NOTHING"
+                query = f"INSERT INTO {table_name} (name, state_name, geom, centroid, bbox, source_fid) VALUES (%s, %s, ST_Multi(ST_Force2D(ST_GeomFromText(%s, 4326))), ST_GeomFromText(%s, 4326), ST_GeomFromText(%s, 4326), %s) ON CONFLICT DO NOTHING"
                 bd = [(b[1], b[2], b[5], b[6], b[7], b[8]) for b in batch]
             elif level == "taluka":
-                query = f"INSERT INTO {table_name} (name, state_name, district_name, geom, centroid, bbox, source_fid) VALUES (%s, %s, %s, ST_Multi(ST_GeomFromText(%s, 4326)), ST_GeomFromText(%s, 4326), ST_GeomFromText(%s, 4326), %s) ON CONFLICT DO NOTHING"
+                query = f"INSERT INTO {table_name} (name, state_name, district_name, geom, centroid, bbox, source_fid) VALUES (%s, %s, %s, ST_Multi(ST_Force2D(ST_GeomFromText(%s, 4326))), ST_GeomFromText(%s, 4326), ST_GeomFromText(%s, 4326), %s) ON CONFLICT DO NOTHING"
                 bd = [(b[1], b[2], b[3], b[5], b[6], b[7], b[8]) for b in batch]
             else:
-                query = f"INSERT INTO {table_name} (name, state_name, district_name, taluka_name, geom, centroid, bbox, source_fid) VALUES (%s, %s, %s, %s, ST_Multi(ST_GeomFromText(%s, 4326)), ST_GeomFromText(%s, 4326), ST_GeomFromText(%s, 4326), %s) ON CONFLICT DO NOTHING"
+                query = f"INSERT INTO {table_name} (name, state_name, district_name, taluka_name, geom, centroid, bbox, source_fid) VALUES (%s, %s, %s, %s, ST_Multi(ST_Force2D(ST_GeomFromText(%s, 4326))), ST_GeomFromText(%s, 4326), ST_GeomFromText(%s, 4326), %s) ON CONFLICT DO NOTHING"
                 bd = [(b[1], b[2], b[3], b[4], b[5], b[6], b[7], b[8]) for b in batch]
 
             cur.executemany(query, bd)

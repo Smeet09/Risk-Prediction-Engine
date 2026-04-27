@@ -73,21 +73,25 @@ export default function AuthPage() {
         {/* Logo / Brand */}
         <div ref={logoRef} style={{ textAlign: "center", marginBottom: 48 }}>
           <div style={{
-            width: 52, height: 52, borderRadius: 16,
-            background: "#000", margin: "0 auto 20px",
-            display: "flex", alignItems: "center", justifyContent: "center"
+            width: 86, height: 86, borderRadius: 16,
+            background: "#fff", margin: "0 auto 20px",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.05)"
           }}>
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
-                stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            <img src="/bisag_logo.png" alt="BISAG Logo" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: 16 }} />
           </div>
-          <p className="t-label" style={{ letterSpacing: "0.2em", marginBottom: 6 }}>AETHER PLATFORM</p>
+          <p className="t-label" style={{ letterSpacing: "0.2em", marginBottom: 6 }}>PREDICTION ENGINE PLATFORM</p>
           <h1 className="t-title" style={{ fontSize: 32, letterSpacing: "-0.035em" }}>
-            Disaster Intelligence
+            GM3 Intelligence
           </h1>
+          <p style={{ color: "#39bd97ff", fontSize: 12, marginTop: 4, fontWeight: 500 }}>
+            Geospatial Multi-Thematic Mathematical Modal
+          </p>
+          <p style={{ color: "#ff9f0a", fontSize: 12, marginTop: 4, fontWeight: 500 }}>
+            This system is only for the India region
+          </p>
           <p style={{ color: "#999", fontSize: 14, marginTop: 8 }}>
-            Sign in to access the management system
+            Sign in
           </p>
         </div>
 
@@ -105,9 +109,11 @@ export default function AuthPage() {
             {["user", "admin"].map((r) => (
               <button
                 key={r}
-                onClick={() => setForm(f => ({ ...f, role: r,
+                onClick={() => setForm(f => ({
+                  ...f, role: r,
                   email: r === "admin" ? "admin@aether.local" : "user@aether.local",
-                  password: "password" }))}
+                  password: "password"
+                }))}
                 style={{
                   padding: "10px", borderRadius: 9, border: "none", cursor: "pointer",
                   fontFamily: "inherit", fontSize: 13, fontWeight: 500,
@@ -166,21 +172,17 @@ export default function AuthPage() {
               style={{ marginTop: 8, width: "100%", justifyContent: "center", padding: "15px" }}
             >
               {loading
-                ? <><span className="anim-spin" style={{ display:"inline-block",width:16,height:16,border:"2px solid rgba(255,255,255,0.3)",borderTopColor:"#fff",borderRadius:"50%" }} /> Signing in...</>
+                ? <><span className="anim-spin" style={{ display: "inline-block", width: 16, height: 16, border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", borderRadius: "50%" }} /> Signing in...</>
                 : "Sign In →"
               }
             </button>
           </form>
 
-          {/* Demo creds hint */}
-          <p style={{ marginTop: 20, fontSize: 12, color: "#bbb", textAlign: "center" }}>
-            Demo — admin@aether.local / user@aether.local · <em>password</em>
-          </p>
         </div>
 
         {/* Footer */}
         <p className="t-small" style={{ marginTop: 32, opacity: 0.5 }}>
-          Aether-Disaster © {new Date().getFullYear()} · GIS Intelligence Platform
+          Prediction Engine © {new Date().getFullYear()} @ BISAG-N
         </p>
       </div>
     </div>

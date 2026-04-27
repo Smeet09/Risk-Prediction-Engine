@@ -205,6 +205,7 @@ export default function RainfallModule() {
             display: "flex", alignItems: "center", gap: 8, color: "#666", fontSize: 13
           }}>← Hub</button>
           <div style={{ width: 1, height: 20, background: "#e5e5e7" }} />
+          <img src="/bisag_logo.png" alt="BISAG Logo" style={{ width: 36, height: 36, objectFit: 'contain', borderRadius: 6, background: '#fff', padding: 2, boxShadow: '0 2px 6px rgba(0,0,0,0.06)' }} />
           <span style={{ fontSize: 15, fontWeight: 600 }}>Rainfall & Weather</span>
           <span style={{
             fontSize: 11, padding: "3px 10px", borderRadius: 50,
