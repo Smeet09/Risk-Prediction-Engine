@@ -106,22 +106,22 @@ VALUES (
 ) ON CONFLICT (email) DO NOTHING;
 
 -- Seed sample regions
-INSERT INTO regions (country, state, district, centroid, bbox)
-VALUES
-  ('India', 'Gujarat', 'Ahmedabad',
-   ST_SetSRID(ST_MakePoint(72.5714, 23.0225), 4326),
-   ST_MakeEnvelope(72.4, 22.9, 72.8, 23.1, 4326)),
-  ('India', 'Gujarat', 'Surat',
-   ST_SetSRID(ST_MakePoint(72.8311, 21.1702), 4326),
-   ST_MakeEnvelope(72.6, 21.0, 73.0, 21.3, 4326)),
-  ('India', 'Maharashtra', 'Mumbai',
-   ST_SetSRID(ST_MakePoint(72.8777, 19.0760), 4326),
-   ST_MakeEnvelope(72.7, 18.9, 73.0, 19.3, 4326)),
-  ('India', 'Rajasthan', 'Jaipur',
-   ST_SetSRID(ST_MakePoint(75.7873, 26.9124), 4326),
-   ST_MakeEnvelope(75.6, 26.7, 75.9, 27.1, 4326))
-ON CONFLICT (country, state, district) DO NOTHING;
+-- INSERT INTO regions (country, state, district, centroid, bbox)
+-- VALUES
+--   ('India', 'Gujarat', 'Ahmedabad',
+--    ST_SetSRID(ST_MakePoint(72.5714, 23.0225), 4326),
+--    ST_MakeEnvelope(72.4, 22.9, 72.8, 23.1, 4326)),
+--   ('India', 'Gujarat', 'Surat',
+--    ST_SetSRID(ST_MakePoint(72.8311, 21.1702), 4326),
+--    ST_MakeEnvelope(72.6, 21.0, 73.0, 21.3, 4326)),
+--   ('India', 'Maharashtra', 'Mumbai',
+--    ST_SetSRID(ST_MakePoint(72.8777, 19.0760), 4326),
+--    ST_MakeEnvelope(72.7, 18.9, 73.0, 19.3, 4326)),
+--   ('India', 'Rajasthan', 'Jaipur',
+--    ST_SetSRID(ST_MakePoint(75.7873, 26.9124), 4326),
+--    ST_MakeEnvelope(75.6, 26.7, 75.9, 27.1, 4326))
+-- ON CONFLICT (country, state, district) DO NOTHING;
 
--- Seed data_inventory for seeded regions
-INSERT INTO data_inventory (region_id)
-SELECT id FROM regions ON CONFLICT (region_id) DO NOTHING;
+-- -- Seed data_inventory for seeded regions
+-- INSERT INTO data_inventory (region_id)
+-- SELECT id FROM regions ON CONFLICT (region_id) DO NOTHING;

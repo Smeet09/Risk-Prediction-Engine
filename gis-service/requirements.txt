@@ -18,3 +18,4 @@ psycopg2-binary
 asyncpg
 pandas
 netCDF4
+python-multipart

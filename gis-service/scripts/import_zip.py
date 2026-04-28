@@ -1,8 +1,12 @@
 import os
 import sys
 import argparse
+import tempfile
+import zipfile
+from pathlib import Path
 import psycopg2
 import geopandas as gpd
+import fiona
 import json
 
 TARGET_CRS = "EPSG:4326"
@@ -31,6 +35,47 @@ def find_col(gdf, candidates):
         if c in gdf.columns: return c
         if c.lower() in cols_lower: return cols_lower[c.lower()]
     return None
+
+
+def locate_shapefile_from_zip(zip_path):
+    """Extract a boundary ZIP and return the first .shp path found.
+
+    Many boundary uploads contain a nested folder structure, so reading the ZIP
+    directly via GeoPandas can fail. Extracting first is more reliable.
+    """
+    extract_dir = tempfile.mkdtemp(prefix="boundary_zip_")
+    with zipfile.ZipFile(zip_path) as zf:
+        zf.extractall(extract_dir)
+
+    shp_files = list(Path(extract_dir).rglob("*.shp"))
+    if not shp_files:
+        raise FileNotFoundError("No .shp file found inside uploaded ZIP archive")
+
+    return str(shp_files[0])
+
+
+def read_shapefile_with_fallback(shp_path):
+    """Read a shapefile with multiple fallbacks for broken DBF/encoding issues."""
+    # First try default engine (pyogrio if installed)
+    try:
+        return gpd.read_file(shp_path)
+    except Exception as e1:
+        # Validate DBF presence
+        dbf_path = Path(shp_path).with_suffix(".dbf")
+        if not dbf_path.exists():
+            raise FileNotFoundError("Missing .dbf file alongside .shp") from e1
+
+        # Fallback to Fiona with common encodings
+        for enc in ("utf-8", "cp1252", "latin1"):
+            try:
+                with fiona.open(shp_path, encoding=enc) as src:
+                    return gpd.GeoDataFrame.from_features(src, crs=src.crs)
+            except Exception:
+                continue
+
+        # Last resort: try Fiona without encoding override
+        with fiona.open(shp_path) as src:
+            return gpd.GeoDataFrame.from_features(src, crs=src.crs)
 
 def import_level(conn, gdf, level, verbose=True):
     gdf = gdf.to_crs(TARGET_CRS)
@@ -128,14 +173,17 @@ def main():
         conn.commit()
         cur.close()
         
-    print("[INFO] Parsing SHP from archive via GeoPandas (this may take a moment based on size)...")
+    print("[INFO] Extracting ZIP and locating SHP file...")
     try:
-        gdf = gpd.read_file(f"zip://{zip_path}")
+        shp_path = locate_shapefile_from_zip(zip_path)
+        print(f"[INFO] Reading shapefile: {shp_path}")
+        gdf = read_shapefile_with_fallback(shp_path)
         print(f"[INFO] Analyzed. Geometries: {len(gdf)} | EPSG CRS: {gdf.crs}")
         n = import_level(conn, gdf, args.level)
         print(f"[SUCCESS] Committed {n} explicit records directly to '{table_name}'.")
     except Exception as e:
         print(f"[ERROR] Spatial ingestion failed natively: {e}")
+        sys.exit(1)
 
     conn.close()
 
