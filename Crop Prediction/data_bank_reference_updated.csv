@@ -1,0 +1,64 @@
+source,crop_type,stage,season,states,doy_min,doy_max,b4,b8,b8a,b11,b12,ndvi,ndre,gndvi,evi,savi,cire,rvi,ndwi,lswi,ndmi,bsi,ndbi,swir_ratio
+data_bank,rice,sowing,kharif,"WB,Punjab,Odisha,AP,TN",152,196,0.062,0.198,0.225,0.142,0.089,0.52,0.38,0.44,0.31,0.42,0.68,3.19,-0.12,0.16,0.22,-0.18,-0.16,0.63
+data_bank,rice,germination,kharif,"WB,Punjab,Odisha,AP,TN",182,220,0.048,0.285,0.312,0.128,0.076,0.71,0.52,0.58,0.44,0.58,0.92,5.94,-0.28,0.38,0.42,-0.32,-0.38,0.41
+data_bank,rice,vegetative,kharif,"WB,Punjab,Odisha,AP,TN",210,258,0.038,0.368,0.402,0.118,0.068,0.81,0.62,0.68,0.55,0.66,1.18,9.68,-0.42,0.51,0.54,-0.48,-0.51,0.29
+data_bank,rice,flowering,kharif,"WB,Punjab,Odisha,AP,TN",245,288,0.032,0.412,0.445,0.108,0.062,0.85,0.68,0.72,0.61,0.7,1.38,12.88,-0.52,0.58,0.61,-0.55,-0.58,0.24
+data_bank,rice,reproductive/pod/fruit formation,kharif,"WB,Punjab,Odisha,AP,TN",289,274,0.044,0.37,0.401,0.135,0.085,0.778,0.604,0.653,0.534,0.637,1.155,9.55,-0.412,0.459,0.489,-0.402,-0.459,0.348
+data_bank,rice,maturity,kharif,"WB,Punjab,Odisha,AP,TN",275,315,0.058,0.318,0.348,0.168,0.112,0.69,0.51,0.57,0.44,0.56,0.88,5.48,-0.28,0.31,0.34,-0.22,-0.31,0.48
+data_bank,rice,harvesting,kharif,"WB,Punjab,Odisha,AP,TN",316,345,0.081,0.207,0.226,0.235,0.168,0.359,0.255,0.296,0.22,0.291,0.44,2.74,-0.1,0.21,0.24,-0.04,-0.21,0.648
+data_bank,wheat,sowing,rabi,"Punjab,Haryana,UP,MP,Rajasthan",285,304,0.123,0.084,0.096,0.205,0.157,0.136,0.088,0.112,0.072,0.112,0.152,0.82,0.23,-0.05,0.01,0.27,0.05,1.066
+data_bank,wheat,germination,rabi,"Punjab,Haryana,UP,MP,Rajasthan",305,345,0.082,0.168,0.192,0.158,0.112,0.34,0.22,0.28,0.18,0.28,0.38,2.05,0.08,0.03,0.09,0.12,-0.03,0.82
+data_bank,wheat,vegetative,rabi,"Punjab,Haryana,UP,MP,Rajasthan",335,395,0.052,0.298,0.328,0.138,0.088,0.7,0.54,0.6,0.45,0.57,0.98,5.73,-0.22,0.36,0.4,-0.28,-0.36,0.42
+data_bank,wheat,flowering,rabi,"Punjab,Haryana,UP,MP,Rajasthan",380,430,0.038,0.428,0.462,0.112,0.072,0.84,0.68,0.72,0.6,0.69,1.32,11.26,-0.48,0.58,0.61,-0.52,-0.58,0.24
+data_bank,wheat,reproductive/pod/fruit formation,rabi,"Punjab,Haryana,UP,MP,Rajasthan",431,419,0.052,0.38,0.414,0.151,0.104,0.755,0.59,0.639,0.51,0.618,1.095,8.326,-0.345,0.427,0.462,-0.34,-0.427,0.384
+data_bank,wheat,maturity,rabi,"Punjab,Haryana,UP,MP,Rajasthan",420,460,0.068,0.322,0.355,0.198,0.142,0.65,0.48,0.54,0.4,0.53,0.82,4.74,-0.18,0.24,0.28,-0.12,-0.24,0.56
+data_bank,wheat,harvesting,rabi,"Punjab,Haryana,UP,MP,Rajasthan",450,480,0.112,0.242,0.268,0.258,0.188,0.37,0.24,0.3,0.21,0.3,0.42,2.16,0.05,0.02,0.02,0.18,-0.02,0.96
+data_bank,groundnut,sowing,kharif,"Gujarat,AP,Rajasthan,TN",132,151,0.108,0.091,0.104,0.192,0.137,0.172,0.112,0.144,0.096,0.14,0.208,1.012,0.17,0.02,0.08,0.23,-0.02,0.923
+data_bank,groundnut,germination,kharif,"Gujarat,AP,Rajasthan,TN",152,190,0.072,0.182,0.208,0.148,0.098,0.43,0.28,0.36,0.24,0.35,0.52,2.53,0.02,0.1,0.16,0.08,-0.1,0.71
+data_bank,groundnut,vegetative,kharif,"Gujarat,AP,Rajasthan,TN",185,235,0.048,0.312,0.342,0.128,0.082,0.73,0.56,0.62,0.48,0.6,1.02,6.5,-0.32,0.42,0.45,-0.36,-0.42,0.37
+data_bank,groundnut,flowering,kharif,"Gujarat,AP,Rajasthan,TN",225,278,0.035,0.398,0.432,0.112,0.068,0.84,0.66,0.71,0.59,0.69,1.28,11.37,-0.48,0.56,0.59,-0.52,-0.56,0.26
+data_bank,groundnut,reproductive/pod/fruit formation,kharif,"Gujarat,AP,Rajasthan,TN",279,264,0.047,0.353,0.385,0.139,0.09,0.759,0.579,0.638,0.509,0.623,1.082,8.418,-0.363,0.43,0.464,-0.367,-0.43,0.377
+data_bank,groundnut,maturity,kharif,"Gujarat,AP,Rajasthan,TN",265,305,0.062,0.298,0.328,0.172,0.118,0.66,0.48,0.55,0.41,0.54,0.84,4.81,-0.22,0.27,0.31,-0.18,-0.27,0.52
+data_bank,groundnut,harvesting,kharif,"Gujarat,AP,Rajasthan,TN",295,325,0.098,0.228,0.252,0.228,0.162,0.4,0.26,0.33,0.22,0.32,0.46,2.33,0.02,0.04,0.05,0.14,-0.04,0.9
+data_bank,cotton,sowing,kharif,"Gujarat,Maharashtra,Telangana",132,151,0.102,0.087,0.099,0.198,0.143,0.176,0.12,0.144,0.1,0.144,0.22,1.028,0.16,-0.01,0.05,0.24,0.01,1.001
+data_bank,cotton,germination,kharif,"Gujarat,Maharashtra,Telangana",152,200,0.068,0.175,0.198,0.152,0.102,0.44,0.3,0.36,0.25,0.36,0.55,2.57,0.01,0.07,0.13,0.09,-0.07,0.77
+data_bank,cotton,vegetative,kharif,"Gujarat,Maharashtra,Telangana",190,252,0.045,0.322,0.355,0.135,0.088,0.75,0.58,0.63,0.5,0.61,1.08,7.16,-0.35,0.41,0.45,-0.38,-0.41,0.38
+data_bank,cotton,flowering,kharif,"Gujarat,Maharashtra,Telangana",240,302,0.038,0.415,0.448,0.122,0.078,0.83,0.65,0.7,0.58,0.68,1.25,10.92,-0.46,0.54,0.57,-0.5,-0.54,0.27
+data_bank,cotton,reproductive/pod/fruit formation,kharif,"Gujarat,Maharashtra,Telangana",303,284,0.046,0.375,0.408,0.146,0.098,0.776,0.592,0.651,0.526,0.635,1.102,8.665,-0.366,0.432,0.467,-0.374,-0.432,0.369
+data_bank,cotton,maturity,kharif,"Gujarat,Maharashtra,Telangana",285,328,0.055,0.325,0.358,0.175,0.122,0.71,0.52,0.59,0.46,0.58,0.92,5.91,-0.25,0.3,0.34,-0.22,-0.3,0.49
+data_bank,cotton,harvesting,kharif,"Gujarat,Maharashtra,Telangana",312,345,0.088,0.248,0.272,0.218,0.155,0.47,0.31,0.38,0.26,0.38,0.55,2.82,-0.02,0.07,0.11,0.08,-0.07,0.8
+data_bank,sugarcane,sowing,annual,"UP,Maharashtra,Karnataka,TN",71,90,0.112,0.092,0.106,0.189,0.133,0.168,0.112,0.14,0.092,0.136,0.2,0.988,0.18,0.04,0.1,0.21,-0.04,0.884
+data_bank,sugarcane,germination,annual,"UP,Maharashtra,Karnataka,TN",91,150,0.075,0.185,0.212,0.145,0.095,0.42,0.28,0.35,0.23,0.34,0.5,2.47,0.03,0.12,0.18,0.06,-0.12,0.68
+data_bank,sugarcane,vegetative,annual,"UP,Maharashtra,Karnataka,TN",121,213,0.042,0.345,0.378,0.125,0.078,0.78,0.6,0.65,0.52,0.63,1.12,8.21,-0.38,0.47,0.5,-0.42,-0.47,0.33
+data_bank,sugarcane,flowering,annual,"UP,Maharashtra,Karnataka,TN",196,288,0.032,0.422,0.458,0.108,0.065,0.86,0.7,0.74,0.62,0.71,1.42,13.19,-0.52,0.59,0.62,-0.56,-0.59,0.24
+data_bank,sugarcane,reproductive/pod/fruit formation,annual,"UP,Maharashtra,Karnataka,TN",289,273,0.039,0.395,0.43,0.126,0.08,0.82,0.651,0.7,0.575,0.674,1.267,10.648,-0.457,0.514,0.544,-0.479,-0.514,0.298
+data_bank,sugarcane,maturity,annual,"UP,Maharashtra,Karnataka,TN",274,335,0.048,0.362,0.395,0.148,0.098,0.77,0.59,0.65,0.52,0.63,1.08,7.54,-0.38,0.42,0.45,-0.38,-0.42,0.37
+data_bank,sugarcane,harvesting,annual,"UP,Maharashtra,Karnataka,TN",305,450,0.072,0.285,0.315,0.195,0.138,0.6,0.44,0.5,0.37,0.49,0.78,3.96,-0.18,0.19,0.23,-0.08,-0.19,0.62
+data_bank,maize,sowing,kharif,"Karnataka,Rajasthan,MP,AP",132,151,0.117,0.096,0.109,0.202,0.147,0.168,0.112,0.14,0.092,0.136,0.208,0.984,0.17,0.03,0.09,0.22,-0.03,0.923
+data_bank,maize,germination,kharif,"Karnataka,Rajasthan,MP,AP",152,185,0.078,0.192,0.218,0.155,0.105,0.42,0.28,0.35,0.23,0.34,0.52,2.46,0.02,0.11,0.17,0.07,-0.11,0.71
+data_bank,maize,vegetative,kharif,"Karnataka,Rajasthan,MP,AP",175,225,0.044,0.352,0.385,0.128,0.082,0.78,0.6,0.65,0.52,0.63,1.12,8.0,-0.38,0.46,0.5,-0.42,-0.46,0.33
+data_bank,maize,flowering,kharif,"Karnataka,Rajasthan,MP,AP",215,265,0.035,0.425,0.458,0.115,0.072,0.85,0.68,0.72,0.61,0.7,1.35,12.14,-0.5,0.57,0.6,-0.54,-0.57,0.25
+data_bank,maize,reproductive/pod/fruit formation,kharif,"Karnataka,Rajasthan,MP,AP",266,254,0.047,0.372,0.404,0.147,0.097,0.765,0.59,0.644,0.52,0.628,1.125,8.914,-0.374,0.426,0.461,-0.369,-0.426,0.385
+data_bank,maize,maturity,kharif,"Karnataka,Rajasthan,MP,AP",255,295,0.062,0.308,0.338,0.185,0.128,0.66,0.48,0.55,0.41,0.54,0.85,4.97,-0.22,0.25,0.29,-0.16,-0.25,0.55
+data_bank,maize,harvesting,kharif,"Karnataka,Rajasthan,MP,AP",285,320,0.102,0.238,0.262,0.238,0.168,0.4,0.25,0.32,0.22,0.32,0.44,2.33,0.03,0.03,0.05,0.16,-0.03,0.91
+data_bank,soybean,sowing,kharif,"MP,Maharashtra,Rajasthan",132,151,0.112,0.094,0.107,0.195,0.14,0.172,0.116,0.144,0.096,0.14,0.216,1.004,0.17,0.03,0.09,0.22,-0.03,0.91
+data_bank,soybean,germination,kharif,"MP,Maharashtra,Rajasthan",152,190,0.075,0.188,0.214,0.15,0.1,0.43,0.29,0.36,0.24,0.35,0.54,2.51,0.02,0.11,0.17,0.07,-0.11,0.7
+data_bank,soybean,vegetative,kharif,"MP,Maharashtra,Rajasthan",182,232,0.046,0.332,0.362,0.13,0.084,0.75,0.58,0.63,0.5,0.61,1.08,7.22,-0.34,0.44,0.47,-0.38,-0.44,0.36
+data_bank,soybean,flowering,kharif,"MP,Maharashtra,Rajasthan",222,272,0.036,0.408,0.442,0.115,0.07,0.84,0.67,0.71,0.6,0.69,1.3,11.33,-0.48,0.56,0.59,-0.52,-0.56,0.26
+data_bank,soybean,reproductive/pod/fruit formation,kharif,"MP,Maharashtra,Rajasthan",273,261,0.049,0.357,0.389,0.145,0.095,0.75,0.576,0.629,0.506,0.614,1.075,8.274,-0.354,0.416,0.451,-0.349,-0.416,0.395
+data_bank,soybean,maturity,kharif,"MP,Maharashtra,Rajasthan",262,302,0.065,0.295,0.325,0.182,0.125,0.64,0.46,0.53,0.39,0.52,0.8,4.54,-0.2,0.24,0.28,-0.14,-0.24,0.56
+data_bank,soybean,harvesting,kharif,"MP,Maharashtra,Rajasthan",292,322,0.105,0.232,0.256,0.242,0.172,0.38,0.24,0.3,0.2,0.31,0.42,2.21,0.04,0.02,0.03,0.18,-0.02,0.95
+data_bank,mustard,sowing,rabi,"Rajasthan,Haryana,MP,UP",268,287,0.128,0.086,0.098,0.211,0.161,0.136,0.088,0.112,0.072,0.112,0.16,0.808,0.23,-0.05,0.01,0.29,0.05,1.079
+data_bank,mustard,germination,rabi,"Rajasthan,Haryana,MP,UP",288,320,0.085,0.172,0.196,0.162,0.115,0.34,0.22,0.28,0.18,0.28,0.4,2.02,0.08,0.03,0.09,0.14,-0.03,0.83
+data_bank,mustard,vegetative,rabi,"Rajasthan,Haryana,MP,UP",310,365,0.055,0.288,0.318,0.142,0.092,0.68,0.52,0.58,0.43,0.55,0.95,5.24,-0.2,0.34,0.38,-0.26,-0.34,0.45
+data_bank,mustard,flowering,rabi,"Rajasthan,Haryana,MP,UP",350,400,0.078,0.318,0.348,0.158,0.108,0.61,0.46,0.52,0.37,0.5,0.82,4.08,-0.12,0.21,0.25,-0.08,-0.21,0.45
+data_bank,mustard,reproductive/pod/fruit formation,rabi,"Rajasthan,Haryana,MP,UP",401,389,0.084,0.294,0.323,0.182,0.128,0.551,0.397,0.462,0.321,0.451,0.703,3.54,-0.075,0.165,0.21,-0.017,-0.165,0.576
+data_bank,mustard,maturity,rabi,"Rajasthan,Haryana,MP,UP",390,430,0.092,0.265,0.292,0.212,0.152,0.48,0.32,0.39,0.26,0.39,0.56,2.88,-0.02,0.11,0.16,0.06,-0.11,0.73
+data_bank,mustard,harvesting,rabi,"Rajasthan,Haryana,MP,UP",420,450,0.118,0.225,0.248,0.268,0.195,0.31,0.19,0.25,0.16,0.25,0.34,1.91,0.12,-0.08,-0.04,0.24,0.08,1.08
+data_bank,onion,sowing,rabi,"Maharashtra,MP,Karnataka,Gujarat",254,273,0.132,0.081,0.092,0.218,0.165,0.12,0.072,0.096,0.06,0.096,0.128,0.736,0.25,-0.06,-0.03,0.33,0.1,1.183
+data_bank,onion,germination,rabi,"Maharashtra,MP,Karnataka,Gujarat",274,310,0.088,0.162,0.185,0.168,0.118,0.3,0.18,0.24,0.15,0.24,0.32,1.84,0.1,0.02,0.05,0.18,0.02,0.91
+data_bank,onion,vegetative,rabi,"Maharashtra,MP,Karnataka,Gujarat",300,355,0.058,0.272,0.298,0.148,0.098,0.65,0.48,0.55,0.4,0.52,0.88,4.69,-0.18,0.3,0.34,-0.22,-0.3,0.5
+data_bank,onion,flowering,rabi,"Maharashtra,MP,Karnataka,Gujarat",340,390,0.048,0.342,0.375,0.132,0.085,0.75,0.58,0.63,0.5,0.61,1.06,7.13,-0.3,0.44,0.47,-0.34,-0.44,0.35
+data_bank,onion,reproductive/pod/fruit formation,rabi,"Maharashtra,MP,Karnataka,Gujarat",391,374,0.061,0.304,0.335,0.162,0.111,0.656,0.49,0.549,0.415,0.534,0.889,5.411,-0.201,0.305,0.34,-0.178,-0.305,0.508
+data_bank,onion,maturity,rabi,"Maharashtra,MP,Karnataka,Gujarat",375,420,0.078,0.258,0.285,0.198,0.142,0.54,0.38,0.45,0.31,0.44,0.68,3.31,-0.08,0.14,0.18,0.02,-0.14,0.7
+data_bank,onion,harvesting,rabi,"Maharashtra,MP,Karnataka,Gujarat",410,445,0.108,0.215,0.238,0.248,0.178,0.33,0.2,0.27,0.17,0.27,0.36,1.99,0.1,-0.07,-0.02,0.22,0.07,1.04

@@ -42,7 +42,10 @@ app.locals.DATA_ROOT = DATA_ROOT;
 
 // ─── Middleware ───────────────────────────────────────────────────────────────
 app.use(cors({
-  origin: process.env.FRONTEND_URL || "http://localhost:5173",
+  origin: [
+    process.env.FRONTEND_URL || "http://localhost:3001",
+    "http://localhost:8501",
+  ],
   credentials: true,
 }));
 app.use(express.json({ limit: "50mb" }));

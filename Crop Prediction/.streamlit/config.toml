@@ -1,0 +1,17 @@
+[server]
+maxUploadSize = 3072
+headless = true
+
+[logger]
+level = "info"
+
+[client]
+showErrorDetails = true
+
+[theme]
+base                = "light"
+backgroundColor     = "#f8f8f9"
+secondaryBackgroundColor = "#ffffff"
+primaryColor        = "#39bd97"
+textColor           = "#000000"
+font                = "sans serif"

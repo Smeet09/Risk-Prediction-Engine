@@ -48,4 +48,9 @@ router.post("/register", async (req, res) => {
   res.status(201).json({ user: rows[0] });
 });
 
+// GET /api/auth/verify  — used by Streamlit to validate a JWT token
+router.get("/verify", require("../middleware/auth").protect, (req, res) => {
+  res.json({ valid: true, user: req.user });
+});
+
 module.exports = router;
