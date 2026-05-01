@@ -12,8 +12,25 @@ router.post("/download", protect, adminOnly, async (req, res) => {
   if (!country || !state || !year || !month) {
     return res.status(400).json({ error: "Missing required parameters (country, state, year, month)." });
   }
+  // 1. Conflict Check: Is the Agent or Admin already running this?
+  try {
+    const activeCheck = await pool.query(
+      `SELECT id FROM jobs 
+       WHERE module = 'weather' AND country = $1 AND state = $2 AND year = $3 AND month = $4 
+         AND status IN ('pending', 'processing')`,
+      [country, state, year, month]
+    );
+    
+    if (activeCheck.rows.length > 0) {
+      return res.status(409).json({ 
+        error: `Conflict: An AI Agent or Admin is already downloading weather for ${state} (${month}/${year}). Please wait for it to finish.` 
+      });
+    }
+  } catch (err) {
+    console.error("Lock check error:", err);
+  }
 
-  // Create job in DB
+  // 2. Create job in DB
   let jobResult;
   try {
     const { rows } = await pool.query(

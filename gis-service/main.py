@@ -7,6 +7,7 @@ load_dotenv()
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routers import dem, era5, susceptibility, terrain, weather, india_layers, dynamic
+from agents import data_ingestion_agent, gis_agent
 
 app = FastAPI(
     title="Aether-Disaster GIS Microservice",
@@ -28,6 +29,9 @@ app.include_router(susceptibility.router, prefix="/api/susceptibility", tags=["S
 app.include_router(weather.router,          prefix="/weather", tags=["Weather Downloader"])
 app.include_router(india_layers.router,     prefix="/api/india-layers", tags=["India-Wide Layers"])
 app.include_router(dynamic.router,          prefix="/dynamic", tags=["Dynamic Risk Prediction"])
+app.include_router(data_ingestion_agent.router, prefix="/api/agents/weather", tags=["Agent - Data Ingestion"])
+app.include_router(gis_agent.router,            prefix="/api/agents/gis", tags=["Agent - GIS Engine"])
+
 
 
 # Global state for tracking active background tasks

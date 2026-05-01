@@ -9,6 +9,7 @@ import DynamicMapping from "../components/admin/DynamicMapping";
 import DisasterManager from "../components/admin/DisasterManager";
 import BoundaryImporter from "../components/admin/BoundaryImporter";
 import WeatherDownload from "../components/admin/WeatherDownload";
+import AgentPipeline from "../components/admin/AgentPipeline";
 
 const NAV_ITEMS = [
   { id: "overview", label: "Overview", icon: "◈" },
@@ -17,6 +18,7 @@ const NAV_ITEMS = [
   { id: "weather", label: "Weather Download", icon: "🌤️" },
   { id: "susceptibility", label: "Susceptibility Gen.", icon: "⚡" },
   { id: "dynamic", label: "Dynamic Risk Gen.", icon: "⚙️" },
+  { id: "agents", label: "Agent Pipeline", icon: "🤖" },
   { id: "disasters", label: "Disaster Types", icon: "🔧" },
 ];
 
@@ -81,6 +83,15 @@ const CONTEXT = {
       { n: "✓", title: "Prerequisites", desc: "Susceptibility map must be generated first. Weather data for target date must exist." },
       { n: "✓", title: "Target Date", desc: "Select a date for which weather data has been downloaded." },
       { n: "✓", title: "Physics Engine", desc: "Runs physics-based models using high-resolution susceptibility maps." },
+    ]
+  },
+  agents: {
+    title: "AI Agent Pipeline Tips",
+    steps: [
+      { n: "✓", title: "Autonomy", desc: "Agents run sequentially fetching data, generating maps, and checking risk." },
+      { n: "✓", title: "Orchestration", desc: "Managed by n8n. Failures are automatically retried 3 times." },
+      { n: "✓", title: "Manual Override", desc: "You can forcefully trigger the pipeline run at any point." },
+      { n: "✓", title: "Logs", desc: "Click the n8n button to see detailed log execution traces." },
     ]
   },
 };
@@ -349,6 +360,9 @@ export default function AdminDashboard() {
           </div>
           <div style={{ display: activeModule === "dynamic" ? "block" : "none" }}>
             <DynamicMapping regionsFlat={regions} jobs={jobs} />
+          </div>
+          <div style={{ display: activeModule === "agents" ? "block" : "none" }}>
+            <AgentPipeline />
           </div>
           <div style={{ display: activeModule === "disasters" ? "block" : "none" }}>
             <DisasterManager />

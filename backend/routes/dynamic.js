@@ -60,15 +60,14 @@ router.post("/predict", protect, async (req, res) => {
       `SELECT id FROM jobs 
        WHERE region_id=$1 AND disaster_type=$2 AND module='dynamic' 
        AND status IN ('pending', 'processing')
-       AND (config->>'targetDate') = $3
        ORDER BY created_at DESC LIMIT 1`,
-      [region_id, disaster_code, targetDate]
+      [region_id, disaster_code]
     );
 
     if (activeJobs.length > 0) {
-      return res.status(202).json({
+      return res.status(409).json({
         jobId: activeJobs[0].id,
-        message: "A prediction job is already in progress for this region. Joining...",
+        error: "Conflict: An AI Agent or Admin is already generating Risk Maps for this region. Please wait.",
         region: { country: region.country, state: region.state, district: region.district },
       });
     }

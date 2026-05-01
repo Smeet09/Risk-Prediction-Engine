@@ -86,6 +86,20 @@ router.post("/susceptibility", protect, adminOnly, async (req, res) => {
     return res.status(400).json({ error: "Not all data is ready for this region" });
   }
 
+  // 1. Conflict Check: Is the Agent or Admin already running this?
+  const { rows: activeCheck } = await pool.query(
+    `SELECT id FROM jobs 
+     WHERE region_id=$1 AND module='susceptibility' AND disaster_type=$2 
+       AND status IN ('pending', 'processing')`,
+    [region_id, disaster_type]
+  );
+
+  if (activeCheck.length > 0) {
+    return res.status(409).json({ 
+      error: `Conflict: An AI Agent or Admin is already processing Susceptibility for this region. Please wait.` 
+    });
+  }
+
   const jobId = uuidv4();
   await pool.query(
     `INSERT INTO jobs (id, region_id, module, disaster_type, status, log)
