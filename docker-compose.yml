@@ -35,6 +35,19 @@ services:
       - GENERIC_TIMEZONE=Asia/Kolkata
     volumes:
       - n8n_data:/home/node/.n8n
+      - ./n8n/workflow.json:/home/node/workflow.json
+
+  # Auto-import workflow on startup
+  n8n-import:
+    image: n8nio/n8n
+    container_name: aether_n8n_import
+    depends_on:
+      - n8n
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./n8n/workflow.json:/home/node/workflow.json
+    entrypoint: /bin/sh
+    command: -c "sleep 10; n8n import:workflow --input=/home/node/workflow.json; exit 0"
 
 volumes:
   pgdata:

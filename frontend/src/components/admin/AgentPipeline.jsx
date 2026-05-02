@@ -14,7 +14,9 @@ const NODE_COLORS = {
 
 export default function AgentPipeline() {
   const [pipelineData, setPipelineData] = useState(null);
+  const [health, setHealth] = useState({ n8n: 'checking', active_runs: 0 });
   const [loading, setLoading] = useState(true);
+  const [syncing, setSyncing] = useState(false);
 
   const fetchPipeline = async () => {
     try {
@@ -22,10 +24,31 @@ export default function AgentPipeline() {
         headers: { Authorization: `Bearer ${localStorage.getItem("aether_token")}` }
       });
       setPipelineData(res.data);
+      
+      const healthRes = await axios.get("http://localhost:4000/api/agents/health-check", {
+        headers: { Authorization: `Bearer ${localStorage.getItem("aether_token")}` }
+      });
+      setHealth(healthRes.data);
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSync = async () => {
+    if (!window.confirm("This will clear all stuck jobs and reset the orchestrator state. Proceed?")) return;
+    setSyncing(true);
+    try {
+      await axios.post("http://localhost:4000/api/agents/sync", {}, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("aether_token")}` }
+      });
+      fetchPipeline();
+      alert("System Synchronized Successfully!");
+    } catch (e) {
+      alert("Sync failed: " + e.message);
+    } finally {
+      setSyncing(false);
     }
   };
 
@@ -36,13 +59,17 @@ export default function AgentPipeline() {
   }, []);
 
   const triggerRun = async () => {
+    if (health.n8n === 'offline') {
+      alert("ORCHESTRATOR OFFLINE: Please ensure Docker is running and n8n workflow is Active.");
+      return;
+    }
     try {
       await axios.post("http://localhost:4000/api/agents/run", {}, { 
         headers: { Authorization: `Bearer ${localStorage.getItem("aether_token")}` }
       });
       fetchPipeline();
     } catch (err) {
-      alert("Failed to start run");
+      alert("Failed to start run: " + err.message);
     }
   };
 
@@ -56,9 +83,21 @@ export default function AgentPipeline() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
           <h2 className="t-heading">Agent Pipeline (Orchestrator)</h2>
-          <p style={{ color: "#666", fontSize: 14 }}>Real-time view of autonomous agent activity</p>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 4 }}>
+            <span style={{ fontSize: 13, color: "#666" }}>System Status:</span>
+            <span style={{ 
+              display: "flex", alignItems: "center", gap: 6, fontSize: 12, fontWeight: 600,
+              color: health.n8n === 'online' ? "#34c759" : "#ff3b30"
+            }}>
+              <span style={{ width: 8, height: 8, borderRadius: "50%", background: health.n8n === 'online' ? "#34c759" : "#ff3b30" }} />
+              n8n {health.n8n.toUpperCase()}
+            </span>
+          </div>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
+          <button className="btn btn-secondary" onClick={handleSync} disabled={syncing}>
+            {syncing ? 'Syncing...' : 'Repair & Sync Pipeline'}
+          </button>
           <button className="btn btn-secondary" onClick={() => window.open('http://localhost:5678', '_blank')}>
             Open n8n Canvas
           </button>

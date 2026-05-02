@@ -88,6 +88,21 @@ npm run dev
 
 ---
 
+## 🤖 3.5. AI Agent Setup (n8n)
+
+The "Agent Pipeline" requires **n8n** to be configured with the master workflow.
+
+1.  **Direct Auto-Setup (Recommended)**:
+    While your Docker containers are running, run this utility to automatically inject the workflow:
+    - **Windows**: `.\scripts\setup_n8n.bat`
+    - **Linux/macOS**: `bash scripts/setup_n8n.sh`
+
+2.  **Manual Verification**:
+    - Open `http://localhost:5678`
+    - Login (Create an owner account on first run).
+    - If the workflow is missing, click **Import from File** and select `n8n/workflow.json`.
+    - Ensure the workflow is **"Active"** (toggle in the top right).
+
 ---
 
 ## 🌍 4. Portability & Moving Data
