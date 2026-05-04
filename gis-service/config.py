@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     HOST:         str = "0.0.0.0"
     PORT:         int = 8000
     BACKEND_URL:  str = "http://localhost:4000"
-    DEM_STUB_MODE:  bool = True
+    DEM_STUB_MODE:  bool = False
     SUSC_STUB_MODE: bool = False   # ← Production: real scripts are now used
 
     # Dataset paths (resolved at startup)

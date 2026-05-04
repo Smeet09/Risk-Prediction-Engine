@@ -52,6 +52,7 @@ copy frontend\.env.example frontend\.env
 ### 🌍 Critical Variables for Portability:
 - **`DATA_ROOT`**: In the root `.env`, set this to your project's `database` path.
 - **`CDS_KEY`**: Get your key from [Copernicus CDS](https://cds.climate.copernicus.eu/) and put it in `gis-service/.env`.
+- **`JWT_SECRET`**: You need a strong random key for security. In your terminal, run `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` to generate a secure string, then paste it in `backend/.env`.
 
 ---
 
