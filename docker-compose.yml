@@ -2,26 +2,26 @@
 services:
   db:
     image: postgis/postgis:15-3.3
-    container_name: aether_db
+    container_name: prediction_db
     restart: unless-stopped
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-aether}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-aether_secret}
-      POSTGRES_DB: ${POSTGRES_DB:-aether_disaster}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-prediction_engine}
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./backend/db/migrations:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-aether} -d ${POSTGRES_DB:-aether_disaster}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-prediction_engine}"]
       interval: 10s
       timeout: 5s
       retries: 5
 
   n8n:
     image: n8nio/n8n
-    container_name: aether_n8n
+    container_name: prediction_n8n
     restart: unless-stopped
     ports:
       - "5678:5678"
@@ -40,7 +40,7 @@ services:
   # Auto-import workflow on startup
   n8n-import:
     image: n8nio/n8n
-    container_name: aether_n8n_import
+    container_name: prediction_n8n_import
     depends_on:
       - n8n
     volumes:

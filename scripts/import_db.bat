@@ -12,9 +12,9 @@ if not exist "database\data_dump.sql" (
 )
 
 :: Check if container is running
-docker ps --filter "name=aether_db" --format "{{.Names}}" | findstr "aether_db" >nul
+docker ps --filter "name=prediction_db" --format "{{.Names}}" | findstr "prediction_db" >nul
 if %errorlevel% neq 0 (
-    echo ❌ Error: The database container 'aether_db' is not running.
+    echo ❌ Error: The database container 'prediction_db' is not running.
     echo Please run 'docker-compose up -d' first.
     pause
     exit /b 1
@@ -31,11 +31,11 @@ if /i "%confirm%" neq "y" (
 
 :: Drop and recreate public schema to ensure a clean import
 echo 🧹 Cleaning local database...
-docker exec -i aether_db psql -U aether -d aether_disaster -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public; GRANT ALL ON SCHEMA public TO aether; GRANT ALL ON SCHEMA public TO public; CREATE EXTENSION IF NOT EXISTS postgis; CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";"
+docker exec -i prediction_db psql -U postgres -d prediction_engine -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public; GRANT ALL ON SCHEMA public TO postgres; GRANT ALL ON SCHEMA public TO public; CREATE EXTENSION IF NOT EXISTS postgis; CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";"
 
 :: Import data
 echo 📥 Importing 'database/data_dump.sql'...
-docker exec -i aether_db psql -U aether -d aether_disaster < database/data_dump.sql
+docker exec -i prediction_db psql -U postgres -d prediction_engine < database/data_dump.sql
 
 if %errorlevel% equ 0 (
     echo ✅ Import complete! Your database is now synced.

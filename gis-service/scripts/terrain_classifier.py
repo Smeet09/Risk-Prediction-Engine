@@ -2,7 +2,7 @@
 terrain_classifier.py — Single-Region Terrain Classifier
 =========================================================
 Adapted from terrain_classify_india.py for integration into the
-Aether-Disaster GIS Microservice.
+Prediction Engine GIS Microservice.
 
 Input  : path to a dem_features/ directory already processed by TopoProcessor
          (expects: breached_dem.tif OR elevation.tif, slope.tif, aspect.tif,

@@ -10,7 +10,7 @@ from routers import dem, era5, susceptibility, terrain, weather, india_layers, d
 from agents import data_ingestion_agent, gis_agent
 
 app = FastAPI(
-    title="Aether-Disaster GIS Microservice",
+    title="Prediction Engine GIS Microservice",
     version="2.0.0",
     description="FastAPI service for DEM processing, terrain classification, and disaster-wise susceptibility generation",
 )

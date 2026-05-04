@@ -11,7 +11,7 @@ const pool = new Pool({
 
 async function repairWeatherLogs() {
     console.log("==========================================");
-    console.log("  Aether-Disaster Weather Log Repair Tool ");
+    console.log("  Prediction Engine Weather Log Repair Tool ");
     console.log("==========================================");
 
     try {

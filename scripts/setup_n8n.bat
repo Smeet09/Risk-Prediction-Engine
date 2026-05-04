@@ -13,9 +13,9 @@ if %ERRORLEVEL% NEQ 0 (
     exit /b 1
 )
 
-:: 2. Check if aether_n8n container exists
+:: 2. Check if prediction_n8n container exists
 echo [2/3] Checking n8n Container...
-docker ps --filter "name=aether_n8n" --format "{{.Names}}" | findstr /i "aether_n8n" >nul
+docker ps --filter "name=prediction_n8n" --format "{{.Names}}" | findstr /i "prediction_n8n" >nul
 if %ERRORLEVEL% NEQ 0 (
     echo [INFO] n8n container not found. Starting services via docker-compose...
     docker-compose up -d n8n
@@ -26,10 +26,10 @@ if %ERRORLEVEL% NEQ 0 (
 :: 3. Export/Import Workflow
 echo [3/3] Importing Agent Workflow into n8n...
 :: Copy workflow file into container temp space
-docker cp n8n/workflow.json aether_n8n:/tmp/workflow.json
+docker cp n8n/workflow.json prediction_n8n:/tmp/workflow.json
 
 :: Use n8n CLI to import it
-docker exec -it aether_n8n n8n import:workflow --input=/tmp/workflow.json
+docker exec -it prediction_n8n n8n import:workflow --input=/tmp/workflow.json
 
 if %ERRORLEVEL% EQU 0 (
     echo.

@@ -7,6 +7,7 @@ import cdsapi
 import zipfile
 import tempfile
 import os
+import requests
 import numpy as np
 import netCDF4 as nc
 from scipy.interpolate import RegularGridInterpolator
@@ -468,6 +469,23 @@ class WeatherDownloader:
             conn.commit(); cur.close(); conn.close()
         except Exception as e:
             print(f"  log_progress error: {e}")
+
+    def _remote_log(self, run_id, agent_name, agent_label, status, progress, step, error=None):
+        """Broadcasts progress to the Centralized Orchestrator API for React UI visibility."""
+        try:
+            url = f"{settings.BACKEND_URL}/api/agents/logs"
+            payload = {
+                "run_id": run_id,
+                "agent_name": agent_name,
+                "agent_label": agent_label,
+                "status": status,
+                "progress_pct": progress,
+                "current_step": step,
+                "error": error
+            }
+            requests.post(url, json=payload, timeout=5)
+        except Exception as e:
+            print(f"  [RemoteLog Error]: {e}")
 
     # ------------------------------------------------------------------
     # Main entry point

@@ -47,7 +47,9 @@ def run_daily_sync(req: DailySyncRequest):
     
     # Iterate safely with massive fault-tolerance
     for state in states:
-        downloader._log(req.job_id, "processing", 10, f"Syncing {state} for {year}-{month}...")
+        msg = f"Syncing {state} for {year}-{month}..."
+        downloader._log(req.job_id, "processing", 10, msg)
+        downloader._remote_log(req.job_id, "data_ingestion", "Fetching Weather", "processing", 10, msg)
         
         # Self-Solving Retry Logic
         max_retries = 3
@@ -55,13 +57,14 @@ def run_daily_sync(req: DailySyncRequest):
         
         for attempt in range(1, max_retries + 1):
             try:
-                # downloader.run returns successfully unless it raises, but we need to ensure it doesn't swallow exceptions silently
                 downloader.run(req.country, state, year, month, req.job_id)
                 success = True
                 break # It worked, exit the retry loop
             except Exception as e:
-                downloader._log(req.job_id, "processing", 10, f"Attempt {attempt}/{max_retries} failed for {state}: {str(e)}. Retrying in 60s...")
-                time.sleep(60) # Wait for CDS API rate limits to reset
+                err_msg = f"Attempt {attempt}/{max_retries} failed for {state}: {str(e)}"
+                downloader._log(req.job_id, "processing", 10, err_msg)
+                downloader._remote_log(req.job_id, "data_ingestion", "Retrying", "processing", 10, err_msg)
+                time.sleep(60) 
                 
         if not success:
             # Fatal Error - Hard halt. Do NOT skip or allow partial data!

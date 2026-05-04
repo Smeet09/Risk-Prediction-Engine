@@ -28,7 +28,7 @@ async function migrate() {
     const appliedFiles = new Set(history.map(h => h.file_name));
 
     console.log("==========================================");
-    console.log("     Aether-Disaster Migration Engine     ");
+    console.log("     Prediction Engine Migration Engine     ");
     console.log("==========================================");
 
     let count = 0;

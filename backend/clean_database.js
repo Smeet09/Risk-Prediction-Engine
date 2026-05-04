@@ -11,7 +11,7 @@ const pool = new Pool({
 
 async function cleanDatabase() {
     console.log("==========================================");
-    console.log("  Aether-Disaster System Handover Cleaner ");
+    console.log("  Prediction Engine System Handover Cleaner ");
     console.log("==========================================");
 
     try {

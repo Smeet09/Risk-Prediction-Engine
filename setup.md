@@ -1,71 +1,71 @@
 # 🛠️ Risk Prediction Engine Setup Guide
 
-This guide provides detailed instructions to set up and run the Risk Prediction Engine on any machine.
+This guide provides detailed instructions to set up and run the Risk Prediction Engine correctly on any machine. Follow these steps in order for a smooth installation.
 
 ---
 
 ## 📋 System Prerequisites
 
-Ensure you have the following installed:
-1.  **Docker Desktop**: Required for the spatial database.
-2.  **Node.js (v18+)**: For the Backend and Frontend services.
-3.  **Python (3.11 - 3.13)**: For the GIS Microservice.
-4.  **GDAL/WhiteboxTools**: (Optional, but required for production processing). WhiteboxTools is typically downloaded automatically by the GIS service or should be placed in the library path.
+Ensure you have the following installed before proceeding:
+1.  **Docker Desktop** (Latest Version): Crucial for PostGIS and n8n orchestration.
+2.  **Node.js (v18 or v20 LTS)**: Required for the Unified Backend and Frontend.
+3.  **Python (3.11 - 3.13)**: Required for the GIS Microservice and Smart Agents.
+4.  **GDAL/WhiteboxTools**: (Optional) These are usually handled by the GIS service, but ensure your system allows binary execution.
 
 ---
 
-## 🗄️ 1. Database Setup
+## 🗄️ Step 1: Infrastructure (Docker)
 
-The system uses **PostgreSQL 15** with **PostGIS**.
+The system uses **PostgreSQL 15** with **PostGIS** and **n8n**.
 
-1.  **Start the container**:
+1.  **Ensure no other services** are using ports `5432` or `5678`.
+2.  **Start the containers**:
     ```powershell
+    # Try the new Docker Compose V2 command first
+    docker compose up -d
+
+    # If that fails, use the old V1 command
     docker-compose up -d
     ```
-2.  **Initialize Schema (if needed)**:
-    If the automatic migrations don't run or you want a fresh start, use the provided schema:
-    ```powershell
-    docker exec -i aether_db psql -U aether -d aether_disaster < database/schema.sql
-    ```
+3.  **Create Admin Migration**: The database tables will auto-generate on first boot.
 
 ---
 
-## 🔑 2. Environment Configuration
+## 🔑 Step 2: Environment Config
 
-The system relies on `.env` files for configuration. Copy the example files and update them with your local paths.
+Copy the example files in **all four** locations. **Do not skip this.**
 
 ```powershell
-# Root (Used by Docker)
+# 1. Root Folder
 copy .env.example .env
 
-# Backend
+# 2. Backend Folder
 copy backend\.env.example backend\.env
 
-# GIS Service
+# 3. GIS Service Folder
 copy gis-service\.env.example gis-service\.env
 
-# Frontend
+# 4. Frontend Folder
 copy frontend\.env.example frontend\.env
 ```
 
-### Critical Environment Variables:
-- `DATA_ROOT`: (In `.env`) Absolute path to your project's storage directory.
-- `DATABASE_URL`: Connection string for PostgreSQL.
-- `GEE_SERVICE_ACCOUNT`: (Optional) For Earth Engine weather downloads.
+### 🌍 Critical Variables for Portability:
+- **`DATA_ROOT`**: In the root `.env`, set this to your project's `database` path.
+- **`CDS_KEY`**: Get your key from [Copernicus CDS](https://cds.climate.copernicus.eu/) and put it in `gis-service/.env`.
 
 ---
 
-## 🚀 3. Starting the Services
+## 🚀 Step 3: Launching Services
 
-Open three separate terminals to run each component.
+Open **three** separate terminals. If you are on a new machine, **ALWAYS run `npm install` first**.
 
-### Terminal A: Backend API (Node.js)
+### Terminal A: Master Backend (Node.js)
 ```powershell
 cd backend
 npm install
 npm run dev
 ```
-- **Port**: `5000`
+- **Port**: `4000` (Must be free)
 
 ### Terminal B: GIS Microservice (Python)
 ```powershell
@@ -76,72 +76,45 @@ pip install -r requirements.txt
 uvicorn main:app --reload --port 8000
 ```
 - **Port**: `8000`
-- **Docs**: `http://localhost:8000/docs`
 
-### Terminal C: Frontend UI (React + Vite)
+### Terminal C: Frontend Dashboard (React + Vite)
 ```powershell
 cd frontend
 npm install
 npm run dev
 ```
-- **Port**: `3001` (or as shown in terminal)
+- **Port**: `3001` or `3000`
 
 ---
 
-## 🤖 3.5. AI Agent Setup (n8n)
+## 🤖 Step 4: AI Agent Orchestration (n8n Sync)
 
-The "Agent Pipeline" requires **n8n** to be configured with the master workflow.
+The system is only "Smart" once n8n has the workflow injected.
 
-1.  **Direct Auto-Setup (Recommended)**:
-    While your Docker containers are running, run this utility to automatically inject the workflow:
+1.  **Run the Auto-Sync Utility**:
     - **Windows**: `.\scripts\setup_n8n.bat`
     - **Linux/macOS**: `bash scripts/setup_n8n.sh`
-
-2.  **Manual Verification**:
-    - Open `http://localhost:5678`
-    - Login (Create an owner account on first run).
-    - If the workflow is missing, click **Import from File** and select `n8n/workflow.json`.
-    - Ensure the workflow is **"Active"** (toggle in the top right).
+2.  **Verify**: Open `http://localhost:5678` in your browser. 
+3.  **Activate**: Click on the workflow named "Risk Prediction Engine Architecture" and toggle it to **ACTIVE** in the top right corner.
 
 ---
 
-## 🌍 4. Portability & Moving Data
+## 🛠️ Step 5: Troubleshooting (Common Glitches)
 
-The system is designed to be mobile.
-- **Move the folder**: You can move the entire project folder to any location.
-- **Update Paths**: Simply edit the `DATA_ROOT` in your `.env` file to point to the new absolute path.
-- **Data Persistence**: All GIS datasets and uploads are stored in the directory defined by `DATA_ROOT`.
-
----
-
-## 🔄 5. Syncing Database Data
-
-If you want to transfer your local database state (all tables and data) to another machine:
-
-### A. On your machine (Export)
-1.  Ensure the database container is running (`docker-compose up -d`).
-2.  Run the export script:
-    ```powershell
-    .\scripts\export_db.bat
-    ```
-3.  This creates a file `database\data_dump.sql`.
-4.  Share this file with your team member (via Google Drive, Slack, etc.).
-
-### B. On team member's machine (Import)
-1.  Place the `data_dump.sql` file into the `database/` folder.
-2.  Ensure the database container is running (`docker-compose up -d`).
-3.  Run the import script:
-    ```powershell
-    .\scripts\import_db.bat
-    ```
-    > [!WARNING]
-    > This will overwrite any existing local data in the team member's database.
+| Issue | Solution |
+| :--- | :--- |
+| **"Pipeline Running" stuck in UI** | Click the **"Repair & Sync"** button in the Admin Dashboard. |
+| **CORS / Access Denied** | Ensure `backend/server.js` lists your frontend port (3000/3001) in the allow list. |
+| **n8n Status Offline** | Ensure Docker is running and you have run `setup_n8n.bat`. |
+| **No Active Regions Found** | You must generate a **Susceptibility Map** for a region before the dynamic agent can map it. |
+| **Python: Module Not Found** | Ensure you are inside the `venv` and ran `pip install -r requirements.txt`. |
 
 ---
 
-## 🛠️ 6. Utility Tools
+## 🌍 Portability & Data Export
 
-Check the `scripts/` and `backend/tools/` directories for administrative scripts:
-- `clean_database.js`: Resets system metadata.
-- `terrain_classify_india.py`: Logic for large-scale terrain analysis.
-- `weather_gee_csv_script.py`: Extracts rainfall data from GEE.
+To move the system to a new PC:
+1.  Zip the entire folder (including `Dataset/`).
+2.  Move it to the new PC.
+3.  Update the **`DATA_ROOT`** in your `.env` to the new absolute path.
+4.  Follow **Steps 1 to 4** above.

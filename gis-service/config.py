@@ -9,7 +9,7 @@ _PROJECT_ROOT    = _GIS_SERVICE_DIR.parent
 
 class Settings(BaseSettings):
     DATA_ROOT:    str = str(_PROJECT_ROOT / "database")
-    DATABASE_URL: str = "postgresql://aether:aether_secret@localhost:5432/aether_disaster"
+    DATABASE_URL: str = "postgresql://postgres:postgres@localhost:5432/prediction_engine"
     CDS_URL:      str = "https://cds.climate.copernicus.eu/api"
     CDS_KEY:      str = "c8969bb3-79bf-4a62-951e-c0e2d6c1788d"
     HOST:         str = "0.0.0.0"

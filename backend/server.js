@@ -43,7 +43,10 @@ app.locals.DATA_ROOT = DATA_ROOT;
 // ─── Middleware ───────────────────────────────────────────────────────────────
 app.use(cors({
   origin: [
-    process.env.FRONTEND_URL || "http://localhost:3001",
+    process.env.FRONTEND_URL || "http://localhost:3000",
+    "http://localhost:3001",
+    "http://localhost:3002",
+    "http://localhost:5173",
     "http://localhost:8501",
   ],
   credentials: true,
@@ -80,7 +83,7 @@ app.use((err, _req, res, _next) => {
 
 const PORT = process.env.PORT || 4000;
 server.listen(PORT, () => {
-  console.log(`\n🌍 Aether Backend v2.0 running at http://localhost:${PORT}`);
+  console.log(`\n🌍 Prediction Engine Backend v2.0 running at http://localhost:${PORT}`);
   console.log(`📁 Data root: ${DATA_ROOT}`);
   console.log(`🔌 WebSocket: ws://localhost:${PORT}/ws`);
   console.log(`🗺️  Boundaries: /api/boundaries`);

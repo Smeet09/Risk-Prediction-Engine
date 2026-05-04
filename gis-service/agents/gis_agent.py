@@ -3,6 +3,7 @@ from datetime import datetime
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 import psycopg2
+import requests
 from config import settings
 from routers.dynamic import _run_dynamic_pipeline
 
@@ -11,6 +12,21 @@ router = APIRouter()
 class GISDailyRunRequest(BaseModel):
     job_id: str
     target_date: str | None = None # YYYY-MM-DD. Defaults to today's date
+
+def remote_log(run_id, agent_name, agent_label, status, progress, step, error=None):
+    try:
+        url = f"{settings.BACKEND_URL}/api/agents/logs"
+        payload = {
+            "run_id": run_id,
+            "agent_name": agent_name,
+            "agent_label": agent_label,
+            "status": status,
+            "progress_pct": progress,
+            "current_step": step,
+            "error": error
+        }
+        requests.post(url, json=payload, timeout=5)
+    except: pass
 
 def get_active_regions():
     conn = psycopg2.connect(settings.DATABASE_URL)
@@ -28,9 +44,18 @@ def get_active_regions():
 # ---------------------------------------------------------
 # Daily Dynamic Risk Mapping Task (Synchronous blocking)
 # ---------------------------------------------------------
+def get_active_disasters():
+    conn = psycopg2.connect(settings.DATABASE_URL)
+    cur = conn.cursor()
+    cur.execute("SELECT code FROM disaster_types WHERE is_active = true")
+    disasters = [row[0] for row in cur.fetchall()]
+    cur.close()
+    conn.close()
+    return disasters
+
 def run_daily_gis(req: GISDailyRunRequest):
     """
-    Renders Topo/Flood risk for all active regions for a specific day.
+    Renders risk for all active regions and disasters for a specific day.
     """
     target = req.target_date
     if not target:
@@ -39,13 +64,24 @@ def run_daily_gis(req: GISDailyRunRequest):
         target = (datetime.now() - timedelta(days=5)).strftime("%Y-%m-%d")
         
     regions = get_active_regions()
-    disasters = ["landslide", "flood"]
+    disasters = get_active_disasters()
+    
+    if not regions or not disasters:
+        remote_log(req.job_id, "gis", "Skipped", "success", 100, f"No regions or disasters are ready for processing on {target}.")
+        return
+
+    total_tasks = len(regions) * len(disasters)
+    task_count = 0
     
     # Iterate safely with massive fault-tolerance
     for r in regions:
         region_id = str(r["id"])
         
         for disaster in disasters:
+            task_count += 1
+            msg = f"Task {task_count}/{total_tasks}: Mapping {r['state']} ({disaster}) for {target}..."
+            remote_log(req.job_id, "gis", "Generating Maps", "processing", int((task_count/total_tasks)*100), msg)
+            
             # Self-Solving Retry Logic
             max_retries = 3
             success = False
@@ -63,7 +99,7 @@ def run_daily_gis(req: GISDailyRunRequest):
                         antecedent_days=10
                     )
                     success = True
-                    break # It worked, exit the retry loop
+                    break 
                 except Exception as e:
                     import time
                     print(f"[GIS Agent] Attempt {attempt}/{max_retries} failed for {r['state']} {disaster}: {str(e)}")

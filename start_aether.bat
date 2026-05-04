@@ -1,18 +1,18 @@
 @echo off
 echo ==============================================
-echo       AETHER DISASTER PREDICTION SYSTEM
+echo       PREDICTION ENGINE SYSTEM
 echo                 STARTUP SCRIPT
 echo ==============================================
 echo.
 
 echo [1/3] Starting Backend Server...
-start "Aether Backend" cmd /k "cd backend && npm run dev"
+start "Prediction Engine Backend" cmd /k "cd backend && npm run dev"
 
 echo [2/3] Starting Frontend Request...
-start "Aether Frontend" cmd /k "cd frontend && npm run dev"
+start "Prediction Engine Frontend" cmd /k "cd frontend && npm run dev"
 
 echo [3/3] Starting Python GIS Service...
-start "Aether GIS Microservice" cmd /k "cd gis-service && .\venv\Scripts\activate && uvicorn main:app --reload --port 8000"
+start "Prediction Engine GIS Microservice" cmd /k "cd gis-service && .\venv\Scripts\activate && uvicorn main:app --reload --port 8000"
 
 echo.
 echo All services are launching in separate windows!

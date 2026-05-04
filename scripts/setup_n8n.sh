@@ -16,9 +16,9 @@ if ! docker ps > /dev/null 2>&1; then
     exit 1
 fi
 
-# 2. Check if aether_n8n container exists
+# 2. Check if prediction_n8n container exists
 echo "[2/3] Checking n8n Container..."
-if [ $(docker ps -q -f name=aether_n8n | wc -l) -eq 0 ]; then
+if [ $(docker ps -q -f name=prediction_n8n | wc -l) -eq 0 ]; then
     echo "[INFO] n8n container not found or stopped. Attempting to start..."
     docker-compose up -d n8n
     echo "[WAIT] Waiting 10 seconds for n8n to initialize..."
@@ -29,10 +29,10 @@ fi
 echo "[3/3] Importing Agent Workflow into n8n..."
 
 # Copy workflow file into container temp space
-docker cp n8n/workflow.json aether_n8n:/tmp/workflow.json
+docker cp n8n/workflow.json prediction_n8n:/tmp/workflow.json
 
 # Use n8n CLI to import it
-docker exec -it aether_n8n n8n import:workflow --input=/tmp/workflow.json
+docker exec -it prediction_n8n n8n import:workflow --input=/tmp/workflow.json
 
 if [ $? -eq 0 ]; then
     echo ""
