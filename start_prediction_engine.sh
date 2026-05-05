@@ -1,4 +1,8 @@
 #!/bin/bash
+set -e
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 echo "=============================================="
 echo "      PREDICTION ENGINE SYSTEM"
 echo "                STARTUP SCRIPT"
@@ -6,23 +10,27 @@ echo "=============================================="
 echo ""
 
 echo "Cleaning up existing ports to avoid conflicts..."
-npx kill-port 4000 3000 3001 8000 8501 >/dev/null 2>&1
+lsof -ti:4000,3000,3001,8000,8501 | xargs -r kill -9 2>/dev/null || true
+echo ""
+
+echo "Initializing n8n workflow sync..."
+bash "$ROOT_DIR/scripts/setup_n8n.sh" || echo "[WARN] n8n setup failed, continuing startup..."
 echo ""
 
 echo "[1/4] Starting Backend Server..."
-(cd backend && npm run dev) &
+(cd "$ROOT_DIR/backend" && npm run dev) &
 BACKEND_PID=$!
 
 echo "[2/4] Starting Frontend Request..."
-(cd frontend && npm run dev) &
+(cd "$ROOT_DIR/frontend" && npm run dev) &
 FRONTEND_PID=$!
 
 echo "[3/4] Starting Python GIS Service..."
-(cd gis-service && source venv/bin/activate && uvicorn main:app --reload --port 8000) &
+(cd "$ROOT_DIR/gis-service" && source venv/bin/activate && uvicorn main:app --reload --port 8000) &
 GIS_PID=$!
 
 echo "[4/4] Starting Crop Prediction (Streamlit)..."
-(cd "Crop Prediction" && streamlit run main_app.py --server.port 8501) &
+(cd "$ROOT_DIR/Crop Prediction" && streamlit run main_app.py --server.port 8501) &
 CROP_PID=$!
 
 echo ""
