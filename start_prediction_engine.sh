@@ -48,4 +48,3 @@ trap "echo -e '\nStopping all services...'; kill $BACKEND_PID $FRONTEND_PID $GIS
 
 # Keep the script alive
 wait
-
