@@ -17,7 +17,7 @@ for %%P in (4000 3000 3001 8000 8501) do (
     for /f "tokens=5" %%a in ('netstat -aon ^| findstr ":%%P " ^| findstr "LISTENING" 2^>nul') do (
         taskkill /PID %%a /F >nul 2>&1
     )
-)
+) 
 echo.
 
 :: Run n8n workflow sync (matches setup_n8n.sh call in .sh)
@@ -44,7 +44,7 @@ echo.
 echo All services are launching in separate windows!
 echo.
 echo   - Backend API   : http://localhost:4000
-echo   - Frontend UI   : http://localhost:3000 (or 3001)
+echo   - Frontend UI   : http://localhost:3001 (or 3000)
 echo   - GIS Service   : http://localhost:8000
 echo   - Crop Predict  : http://localhost:8501
 echo.

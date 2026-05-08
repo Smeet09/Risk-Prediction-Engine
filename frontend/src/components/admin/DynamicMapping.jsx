@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   getStates, getDistricts, getTalukas,
@@ -8,6 +8,7 @@ import JobProgress from "./JobProgress";
 
 export default function DynamicMapping({ regionsFlat = [], jobs = [] }) {
   const navigate = useNavigate();
+  const logAnchorRef = useRef(null);
   const [states,    setStates]    = useState([]);
   const [districts, setDistricts] = useState([]);
   const [talukas,   setTalukas]   = useState([]);
@@ -32,6 +33,14 @@ export default function DynamicMapping({ regionsFlat = [], jobs = [] }) {
   const [loading,   setLoading]   = useState(false);
 
   const [step, setStep] = useState(1);
+
+  const handleViewLog = (id) => {
+    setJobId(id);
+    setJobStatus(null);
+    setTimeout(() => {
+      logAnchorRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
+  };
 
   // Filter ready regions
   const readyRegions = regionsFlat.filter(r => r.susceptibility_ready);
@@ -119,7 +128,7 @@ export default function DynamicMapping({ regionsFlat = [], jobs = [] }) {
       setError(err.response?.data?.error || err.message);
       setJobStatus("failed");
     } finally {
-      if (jobStatus === "failed") setLoading(false);
+      setLoading(false);
     }
   };
 
@@ -300,7 +309,7 @@ export default function DynamicMapping({ regionsFlat = [], jobs = [] }) {
                         </span>
                       </td>
                       <td style={{ padding: "12px 20px", textAlign: "center", display: "flex", gap: 8, justifyContent: "center" }}>
-                        <button className="btn btn-secondary btn-sm" onClick={() => setJobId(sj.id)}>👁️ View Log</button>
+                        <button className="btn btn-secondary btn-sm" onClick={() => handleViewLog(sj.id)}>👁️ View Log</button>
                         {isDone && (
                           <button 
                             className="btn btn-primary btn-sm" 
@@ -319,7 +328,8 @@ export default function DynamicMapping({ regionsFlat = [], jobs = [] }) {
           )}
         </div>
         
-        {jobId && !["pending", "processing"].includes(jobStatus) && step !== 3 && (
+        <div ref={logAnchorRef} />
+        {jobId && (
           <div style={{ position: "relative", marginTop: 24, zIndex: 10 }}>
             <button onClick={() => { setJobId(null); setJobStatus(null); }} style={{ position: "absolute", top: 10, right: 10, zIndex: 20, background: "none", border: "none", color: "#666", cursor: "pointer", fontSize: 18 }} title="Close Progress View">✕</button>
             <JobProgress jobId={jobId} onDone={() => {}} module="dynamic" />

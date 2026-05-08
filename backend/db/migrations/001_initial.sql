@@ -90,7 +90,7 @@ CREATE INDEX IF NOT EXISTS idx_rainfall_region_date ON rainfall_timeseries(regio
 -- Password: Admin@1234 (bcrypt hash — change in production!)
 INSERT INTO users (email, password, role, full_name)
 VALUES (
-  'admin@aether.local',
+  'admin@bisag.predictionengine',
   '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
   'admin',
   'System Administrator'
@@ -99,7 +99,7 @@ VALUES (
 -- Seed demo user
 INSERT INTO users (email, password, role, full_name)
 VALUES (
-  'user@aether.local',
+  'user@bisag.predictionengine',
   '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
   'user',
   'Demo User'

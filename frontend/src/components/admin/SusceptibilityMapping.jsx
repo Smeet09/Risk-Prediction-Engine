@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   getStates, getDistricts, getTalukas,
@@ -27,6 +27,7 @@ function pctToWeight(pct) {
 
 export default function SusceptibilityMapping({ regionsFlat = [], jobs = [] }) {
   const navigate = useNavigate();
+  const logAnchorRef = useRef(null);
   const [states,    setStates]    = useState([]);
   const [districts, setDistricts] = useState([]);
   const [talukas,   setTalukas]   = useState([]);
@@ -51,6 +52,14 @@ export default function SusceptibilityMapping({ regionsFlat = [], jobs = [] }) {
   const [loading,   setLoading]   = useState(false);
 
   const [step, setStep] = useState(1);
+
+  const handleViewLog = (id) => {
+    setJobId(id);
+    setJobStatus(null);
+    setTimeout(() => {
+      logAnchorRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
+  };
 
   useEffect(() => {
     const fetchS = () => {
@@ -142,12 +151,24 @@ export default function SusceptibilityMapping({ regionsFlat = [], jobs = [] }) {
         setProgress(d.progress ?? 0);
         setLog(d.log ?? "");
         setJobStatus(d.status);
-        if (d.status === "done" || d.status === "failed") ws.close();
+        if (d.status === "done") ws.close();
+        if (d.status === "failed") {
+          ws.close();
+          setTimeout(() => {
+            alert("Generation Failed: Refreshing page for clean state...");
+            window.location.reload();
+          }, 3000);
+        }
       };
       ws.onerror = () => ws.close();
     } catch (err) {
-      setError(err.response?.data?.error || err.message);
+      const msg = err.response?.data?.error || err.message;
+      setError(msg);
       setJobStatus("failed");
+      setTimeout(() => {
+        alert("Generation Error: " + msg);
+        window.location.reload();
+      }, 3000);
     } finally {
       setLoading(false);
     }
@@ -559,7 +580,7 @@ export default function SusceptibilityMapping({ regionsFlat = [], jobs = [] }) {
                         </span>
                       </td>
                       <td style={{ padding: "12px 20px", textAlign: "center", display: "flex", gap: 8, justifyContent: "center" }}>
-                        <button className="btn btn-secondary btn-sm" onClick={() => setJobId(sj.id)}>👁️ View Log</button>
+                        <button className="btn btn-secondary btn-sm" onClick={() => handleViewLog(sj.id)}>👁️ View Log</button>
                         {isDone && (
                           <button 
                             className="btn btn-primary btn-sm" 
@@ -578,7 +599,8 @@ export default function SusceptibilityMapping({ regionsFlat = [], jobs = [] }) {
           )}
         </div>
         
-        {jobId && !["pending", "processing"].includes(jobStatus) && step !== 4 && (
+        <div ref={logAnchorRef} />
+        {jobId && (
           <div style={{ position: "relative", marginTop: 24, zIndex: 10 }}>
             <button 
               onClick={() => { setJobId(null); setJobStatus(null); }}

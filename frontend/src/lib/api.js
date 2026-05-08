@@ -156,3 +156,10 @@ export const getDynamicHistory = (region_id, disaster_code) =>
 export const getDynamicAvailableDates = (region_id, disaster_code) =>
   api.get(`/dynamic/available-dates/${region_id}/${disaster_code}`).then((r) => r.data);
 
+// ─── Agents ──────────────────────────────────────────────────────────────────
+export const getAgentHistory = () => api.get("/agents/history").then((r) => r.data);
+export const getAgentHealth  = () => api.get("/agents/health-check").then((r) => r.data);
+export const runAgentSync    = () => api.post("/agents/sync").then((r) => r.data);
+export const triggerAgentRun = (regions, dataDate) => 
+  api.post("/agents/run", { regions, data_date: dataDate }).then((r) => r.data);
+

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { getAgentHistory, getAgentHealth, runAgentSync, triggerAgentRun } from "../../lib/api";
 
 // Node colors mapping based on node type
 const NODE_COLORS = {
@@ -20,15 +20,11 @@ export default function AgentPipeline() {
 
   const fetchPipeline = async () => {
     try {
-      const res = await axios.get("http://localhost:4000/api/agents/history", {
-        headers: { Authorization: `Bearer ${localStorage.getItem("aether_token")}` }
-      });
-      setPipelineData(res.data);
+      const data = await getAgentHistory();
+      setPipelineData(data);
       
-      const healthRes = await axios.get("http://localhost:4000/api/agents/health-check", {
-        headers: { Authorization: `Bearer ${localStorage.getItem("aether_token")}` }
-      });
-      setHealth(healthRes.data);
+      const healthData = await getAgentHealth();
+      setHealth(healthData);
     } catch (err) {
       console.error(err);
     } finally {
@@ -40,9 +36,7 @@ export default function AgentPipeline() {
     if (!window.confirm("This will clear all stuck jobs and reset the orchestrator state. Proceed?")) return;
     setSyncing(true);
     try {
-      await axios.post("http://localhost:4000/api/agents/sync", {}, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("aether_token")}` }
-      });
+      await runAgentSync();
       fetchPipeline();
       alert("System Synchronized Successfully!");
     } catch (e) {
@@ -64,9 +58,7 @@ export default function AgentPipeline() {
       return;
     }
     try {
-      await axios.post("http://localhost:4000/api/agents/run", {}, { 
-        headers: { Authorization: `Bearer ${localStorage.getItem("aether_token")}` }
-      });
+      await triggerAgentRun();
       fetchPipeline();
     } catch (err) {
       alert("Failed to start run: " + err.message);

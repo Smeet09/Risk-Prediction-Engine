@@ -1,4 +1,5 @@
 {
+  "id": "1",
   "name": "Risk Prediction Engine Architecture",
   "nodes": [
     {
@@ -10,7 +11,10 @@
       "name": "Webhook Trigger",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 1,
-      "position": [ 250, 450 ],
+      "position": [
+        250,
+        450
+      ],
       "webhookId": "run-pipeline-id-1234"
     },
     {
@@ -27,7 +31,10 @@
       "name": "Schedule Trigger",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1,
-      "position": [ 250, 250 ]
+      "position": [
+        250,
+        250
+      ]
     },
     {
       "parameters": {
@@ -46,7 +53,10 @@
       "name": "Start Run on Orchestrator",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 3,
-      "position": [ 450, 250 ]
+      "position": [
+        450,
+        250
+      ]
     },
     {
       "parameters": {
@@ -62,7 +72,10 @@
       "name": "Data Ingestion Agent",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 3,
-      "position": [ 650, 350 ]
+      "position": [
+        650,
+        350
+      ]
     },
     {
       "parameters": {
@@ -71,17 +84,32 @@
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
-            { "name": "run_id", "value": "={{ $('Webhook Trigger').item?.body?.run_id || $json.run_id }}" },
-            { "name": "agent_name", "value": "data_ingestion" },
-            { "name": "agent_label", "value": "Data Fetched" },
-            { "name": "status", "value": "success" }
+            {
+              "name": "run_id",
+              "value": "={{ $('Webhook Trigger').item?.body?.run_id || $json.run_id }}"
+            },
+            {
+              "name": "agent_name",
+              "value": "data_ingestion"
+            },
+            {
+              "name": "agent_label",
+              "value": "Data Fetched"
+            },
+            {
+              "name": "status",
+              "value": "success"
+            }
           ]
         }
       },
       "name": "Log Success (Data)",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 3,
-      "position": [ 850, 350 ]
+      "position": [
+        850,
+        350
+      ]
     },
     {
       "parameters": {
@@ -97,7 +125,10 @@
       "name": "GIS Processing Agent",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 3,
-      "position": [ 1050, 350 ]
+      "position": [
+        1050,
+        350
+      ]
     },
     {
       "parameters": {
@@ -107,14 +138,20 @@
       "name": "Log Success (GIS)",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 3,
-      "position": [ 1250, 350 ]
+      "position": [
+        1250,
+        350
+      ]
     },
     {
       "parameters": {},
       "name": "Error Trigger",
       "type": "n8n-nodes-base.errorTrigger",
       "typeVersion": 1,
-      "position": [ 250, 750 ]
+      "position": [
+        250,
+        750
+      ]
     },
     {
       "parameters": {
@@ -127,30 +164,89 @@
       "name": "Log Failure (Global)",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 3,
-      "position": [ 450, 750 ]
+      "position": [
+        450,
+        750
+      ]
     }
   ],
   "connections": {
     "Error Trigger": {
-      "main": [ [ { "node": "Log Failure (Global)", "type": "main", "index": 0 } ] ]
+      "main": [
+        [
+          {
+            "node": "Log Failure (Global)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Schedule Trigger": {
-      "main": [ [ { "node": "Start Run on Orchestrator", "type": "main", "index": 0 } ] ]
+      "main": [
+        [
+          {
+            "node": "Start Run on Orchestrator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Start Run on Orchestrator": {
-      "main": [ [ { "node": "Data Ingestion Agent", "type": "main", "index": 0 } ] ]
+      "main": [
+        [
+          {
+            "node": "Data Ingestion Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Webhook Trigger": {
-      "main": [ [ { "node": "Data Ingestion Agent", "type": "main", "index": 0 } ] ]
+      "main": [
+        [
+          {
+            "node": "Data Ingestion Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Data Ingestion Agent": {
-       "main": [ [ { "node": "Log Success (Data)", "type": "main", "index": 0 } ] ]
+      "main": [
+        [
+          {
+            "node": "Log Success (Data)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Log Success (Data)": {
-       "main": [ [ { "node": "GIS Processing Agent", "type": "main", "index": 0 } ] ]
+      "main": [
+        [
+          {
+            "node": "GIS Processing Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "GIS Processing Agent": {
-       "main": [ [ { "node": "Log Success (GIS)", "type": "main", "index": 0 } ] ]
+      "main": [
+        [
+          {
+            "node": "Log Success (GIS)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {}

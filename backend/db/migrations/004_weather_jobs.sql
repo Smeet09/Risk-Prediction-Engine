@@ -7,5 +7,5 @@ ALTER TABLE jobs ADD COLUMN IF NOT EXISTS state TEXT;
 DO $$ 
 BEGIN
     ALTER TABLE jobs DROP CONSTRAINT IF EXISTS jobs_module_check;
-    ALTER TABLE jobs ADD CONSTRAINT jobs_module_check CHECK (module IN ('dem', 'exposure', 'manual', 'susceptibility', 'weather'));
+    ALTER TABLE jobs ADD CONSTRAINT jobs_module_check CHECK (module IN ('dem', 'exposure', 'manual', 'susceptibility', 'weather', 'dynamic'));
 END $$;

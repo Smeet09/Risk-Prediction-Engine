@@ -100,13 +100,21 @@ def run_daily_gis(req: GISDailyRunRequest):
                     )
                     success = True
                     break 
+                except ValueError as ve:
+                    # Specific case: Prerequisite check failed (e.g. missing susceptibility map)
+                    # We SKIP this task instead of crashing the whole orchestrator.
+                    warn_msg = f"SKIPPING: {r['state']} ({disaster}): {str(ve)}"
+                    print(f"[GIS Agent] {warn_msg}")
+                    remote_log(req.job_id, "gis", "Prerequisite Missing", "success", int((task_count/total_tasks)*100), warn_msg)
+                    success = True # Mark as "handled"
+                    break
                 except Exception as e:
                     import time
                     print(f"[GIS Agent] Attempt {attempt}/{max_retries} failed for {r['state']} {disaster}: {str(e)}")
                     time.sleep(10) 
                     
             if not success:
-                # Fatal Error - Hard halt
+                # Fatal Error - Hard halt for unexpected crashes (e.g. DB down, Rasterio OOM)
                 fatal_msg = f"FATAL ERROR: GIS Mapping failed for {region_id} ({disaster}) after {max_retries} attempts."
                 raise Exception(fatal_msg) # Throws 500 back to n8n
 

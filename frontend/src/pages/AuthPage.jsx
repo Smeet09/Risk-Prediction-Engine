@@ -67,14 +67,15 @@ export default function AuthPage() {
   };
 
   const Logo = () => (
-    <div ref={logoRef} style={{ textAlign: "center", marginBottom: 40 }}>
+    <div ref={logoRef} style={{ textAlign: "center", marginBottom: 30 }}>
       <div style={{
-        width: 86, height: 86, borderRadius: 16,
-        background: "#fff", margin: "0 auto 20px",
+        width: 100, height: 100, borderRadius: 24,
+        background: "#fff", margin: "0 auto 24px",
         display: "flex", alignItems: "center", justifyContent: "center",
-        boxShadow: "0 4px 12px rgba(0,0,0,0.05)"
+        boxShadow: "0 10px 30px rgba(0,0,0,0.06)",
+        padding: 10
       }}>
-        <img src="/bisag_logo.png" alt="BISAG Logo" style={{ width: "100%", height: "100%", objectFit: "contain", borderRadius: 16 }} />
+        <img src="/bisag_logo.png" alt="BISAG Logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
       </div>
       <p className="t-label" style={{ letterSpacing: "0.2em", marginBottom: 6 }}>PREDICTION ENGINE PLATFORM</p>
       <h1 className="t-title" style={{ fontSize: 32, letterSpacing: "-0.035em" }}>GM3 Intelligence</h1>
@@ -92,7 +93,7 @@ export default function AuthPage() {
       }}>
         {[
           { id: "disaster", label: "⚠ Disaster Prediction" },
-          { id: "crop",     label: "🌾 Crop Prediction" }
+          { id: "crop", label: "🌾 Crop Prediction" }
         ].map(({ id, label }) => (
           <button
             key={id}
@@ -185,32 +186,34 @@ export default function AuthPage() {
   }
 
   return (
-    <div style={{ position: "relative", height: "100vh", overflow: "hidden", background: "#f8f8f9" }}>
+    <div style={{ position: "relative", minHeight: "100vh", background: "#f8f8f9", overflowY: "auto" }}>
       <TopographyBackground />
 
       {/* Overlay gradient */}
       <div style={{
         position: "fixed", inset: 0, zIndex: 1,
-        background: "linear-gradient(135deg, rgba(248,248,249,0.85) 0%, rgba(255,255,255,0.75) 100%)"
+        background: "linear-gradient(135deg, rgba(248,248,249,0.92) 0%, rgba(255,255,255,0.7) 100%)"
       }} />
 
-      {/* Centered Auth Card */}
+      {/* Centered Auth Content */}
       <div style={{
         position: "relative", zIndex: 2,
-        height: "100vh",
+        minHeight: "100vh",
         display: "flex", flexDirection: "column",
         alignItems: "center", justifyContent: "center",
-        padding: "24px"
+        padding: "60px 24px" // Increased vertical padding to prevent clipping
       }}>
         {/* Logo / Brand */}
         <Logo />
-        <p style={{ color: "#999", fontSize: 14, marginTop: -24, marginBottom: 32 }}>Sign in</p>
 
         {/* Form Card */}
         <div className="glass" style={{
-          width: "100%", maxWidth: 400,
-          padding: "40px", borderRadius: 28,
+          width: "100%", maxWidth: 440,
+          padding: "48px 40px", borderRadius: 32,
+          boxShadow: "0 20px 60px rgba(0,0,0,0.05), inset 0 0 0 1px rgba(255,255,255,0.4)"
         }}>
+          <p style={{ color: "#999", fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 24, textAlign: "center" }}>Identity Verification</p>
+
           {/* System Selector */}
           <SystemSelector />
 
@@ -218,41 +221,42 @@ export default function AuthPage() {
           <div className="auth-field" style={{
             display: "grid", gridTemplateColumns: "1fr 1fr",
             gap: 6, marginBottom: 28,
-            background: "#f0f0f1", borderRadius: 12, padding: 4
+            background: "rgba(0,0,0,0.05)", borderRadius: 14, padding: 5
           }}>
             {["user", "admin"].map((r) => (
               <button
                 key={r}
                 onClick={() => setForm(f => ({
                   ...f, role: r,
-                  email: r === "admin" ? "admin@aether.local" : "user@aether.local",
+                  email: r === "admin" ? "admin@bisag.predictionengine" : "user@bisag.predictionengine",
                   password: "password"
                 }))}
                 style={{
-                  padding: "10px", borderRadius: 9, border: "none", cursor: "pointer",
-                  fontFamily: "inherit", fontSize: 13, fontWeight: 500,
+                  padding: "12px", borderRadius: 10, border: "none", cursor: "pointer",
+                  fontFamily: "inherit", fontSize: 13, fontWeight: 600,
                   transition: "all 0.2s ease",
                   background: form.role === r ? "#fff" : "transparent",
-                  color: form.role === r ? "#000" : "#999",
-                  boxShadow: form.role === r ? "0 2px 8px rgba(0,0,0,0.08)" : "none"
+                  color: form.role === r ? "#000" : "#888",
+                  boxShadow: form.role === r ? "0 4px 12px rgba(0,0,0,0.1)" : "none"
                 }}
               >
-                {r === "admin" ? "⚙ Admin" : "◉ User"}
+                {r === "admin" ? "⚙ Admin Space" : "◉ User Portal"}
               </button>
             ))}
           </div>
 
-          <form ref={formRef} onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <form ref={formRef} onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
             <div className="auth-field form-group">
               <label className="form-label">Email Address</label>
               <input
                 className="input"
                 type="email"
-                placeholder="you@example.com"
+                placeholder="you@bisag.predictionengine"
                 value={form.email}
                 onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
                 required
                 autoComplete="email"
+                style={{ background: "rgba(255,255,255,0.6)" }}
               />
             </div>
 
@@ -266,6 +270,7 @@ export default function AuthPage() {
                 onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
                 required
                 autoComplete="current-password"
+                style={{ background: "rgba(255,255,255,0.6)" }}
               />
             </div>
 
@@ -283,11 +288,11 @@ export default function AuthPage() {
               className="auth-field btn btn-primary"
               type="submit"
               disabled={loading}
-              style={{ marginTop: 8, width: "100%", justifyContent: "center", padding: "15px" }}
+              style={{ marginTop: 10, width: "100%", justifyContent: "center", padding: "16px", borderRadius: 14, fontSize: 15 }}
             >
               {loading
-                ? <><span className="anim-spin" style={{ display: "inline-block", width: 16, height: 16, border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", borderRadius: "50%" }} /> Signing in...</>
-                : "Sign In →"
+                ? <><span className="anim-spin" style={{ display: "inline-block", width: 16, height: 16, border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", borderRadius: "50%" }} /> Authenticating...</>
+                : "Authorize & Sign In"
               }
             </button>
           </form>
@@ -295,9 +300,18 @@ export default function AuthPage() {
         </div>
 
         {/* Footer */}
-        <p className="t-small" style={{ marginTop: 32, opacity: 0.5 }}>
-          Prediction Engine © {new Date().getFullYear()} @ BISAG-N
-        </p>
+        <div style={{ marginTop: 40, textAlign: "center" }}>
+          <p className="t-small" style={{ opacity: 0.6, fontSize: 11, letterSpacing: "0.05em" }}>
+            PREDICTION ENGINE · VERSION 2.4.0-STABLE
+          </p>
+          <div style={{ display: "flex", gap: 15, justifyContent: "center", marginTop: 8 }}>
+            <span style={{ fontSize: 10, color: "#999" }}>Security Policy</span>
+            <span style={{ fontSize: 10, color: "#999" }}>Infrastructure Status</span>
+          </div>
+          <p className="t-small" style={{ marginTop: 16, opacity: 0.4 }}>
+            © {new Date().getFullYear()} @ BISAG-N · Government of India
+          </p>
+        </div>
       </div>
     </div>
   );

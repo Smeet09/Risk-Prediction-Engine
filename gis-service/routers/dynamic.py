@@ -363,21 +363,38 @@ def _run_dynamic_pipeline(
         dprint(f"  DYNAMIC RISK  |  {disaster_code.upper()}  |  {state}  |  {target_date}")
         dprint(f"{'='*62}")
 
-        # ── [1] Master Grid Resolution Detection ──────────────────────────────
-        _log_job(job_id, "processing", 5, "[1/7] Detecting high-res master grid…")
+        # ── [1] PREREQUISITE CHECK — Susceptibility Map Must Exist ────────────
+        # This is a hard requirement. Dynamic risk is physically meaningless
+        # without a matching susceptibility map for the selected disaster type.
+        # E.g. you CANNOT run Landslide dynamic risk if only a Flood map exists.
+        _log_job(job_id, "processing", 5, f"[1/7] Checking prerequisites for '{disaster_code}' susceptibility map…")
         susc_tif  = get_susceptibility_path_from_db(settings.DATABASE_URL, region_id, disaster_code)
         susc_path = _find_class_tif(susc_tif, disaster_code)
 
+        if not susc_tif:
+            raise ValueError(
+                f"PREREQUISITE FAILED: No '{disaster_code}' susceptibility map found in the "
+                f"database for this region. Please generate the '{disaster_code.capitalize()}' "
+                f"susceptibility map first under 'Susceptibility Gen.' before running Dynamic Risk."
+            )
+        if not susc_path or not Path(susc_path).exists():
+            raise ValueError(
+                f"PREREQUISITE FAILED: The '{disaster_code}' susceptibility map is registered "
+                f"in the database but the file is missing on disk: '{susc_path}'. "
+                f"Please re-generate the '{disaster_code.capitalize()}' susceptibility map."
+            )
+
+        dprint(f"  [PreCheck] ✅ '{disaster_code}' susceptibility map found: {Path(susc_path).name}")
+
         master_meta = None
-        if susc_path and Path(susc_path).exists():
-            with rasterio.open(susc_path) as src:
-                master_meta = {
-                    "nrows": src.height,
-                    "ncols": src.width,
-                    "transform": src.transform,
-                    "crs": src.crs,
-                }
-        
+        with rasterio.open(susc_path) as src:
+            master_meta = {
+                "nrows": src.height,
+                "ncols": src.width,
+                "transform": src.transform,
+                "crs": src.crs,
+            }
+
         # ── [2] Weather from DB ───────────────────────────────────────────────
         _log_job(job_id, "processing", 15, "[2/7] Loading weather data from DB…")
         weather_df = load_weather_from_db(
@@ -401,24 +418,15 @@ def _run_dynamic_pipeline(
             )
 
         # ── [4] High-Res Alignment & Upsampling ────────────────────────────────
-        if master_meta:
-            _log_job(job_id, "processing", 45, "[4/7] Upsampling trigger to master grid (Pixel Size)…")
-            from scripts.dynamic_core import upsample_array
-            trigger_score = upsample_array(trigger_score_2km, grid_meta_2km["transform"], master_meta)
-            grid_meta = master_meta
-            high_res = True
-        else:
-            _log_job(job_id, "processing", 45, "[4/7] No master grid — using 2km fallback…")
-            trigger_score = trigger_score_2km
-            grid_meta = grid_meta_2km
-            high_res = False
+        _log_job(job_id, "processing", 45, "[4/7] Upsampling trigger to master grid (Pixel Size)…")
+        from scripts.dynamic_core import upsample_array
+        trigger_score = upsample_array(trigger_score_2km, grid_meta_2km["transform"], master_meta)
+        grid_meta = master_meta
+        high_res = True
 
-        # ── [5] Susceptibility raster ─────────────────────────────────────────
+        # ── [5] Susceptibility raster (guaranteed to exist — checked in Step 1) ─
         _log_job(job_id, "processing", 60, "[5/7] Finalizing susceptibility layer…")
-        if susc_path and Path(susc_path).exists():
-            susc_norm = aggregate_susceptibility(grid_meta, susc_path, high_res=high_res)
-        else:
-            susc_norm = np.full((grid_meta["nrows"], grid_meta["ncols"]), 0.5, dtype="float32")
+        susc_norm = aggregate_susceptibility(grid_meta, susc_path, high_res=high_res)
 
         # ── [6] LULC ──────────────────────────────────────────────────────────
         _log_job(job_id, "processing", 75, "[6/7] Finalizing LULC layer…")

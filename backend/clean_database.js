@@ -16,10 +16,10 @@ async function cleanDatabase() {
 
     try {
         console.log("\n[1/3] Wiping operational data (preserving weather/manual indices)...");
-        
+
         // 1. Wipe jobs EXCEPT weather and manual import history
         await pool.query(`DELETE FROM jobs WHERE module NOT IN ('weather', 'manual_import', 'manual_data')`);
-        
+
         // 2. Wipe ONLY operational results (No Cascade on master tables)
         await pool.query(`
             TRUNCATE TABLE 
@@ -38,7 +38,7 @@ async function cleanDatabase() {
 
         // 3. Reset Inventory but SELF-HEAL based on persisting tables (Weather & Manual)
         console.log("   -> Self-healing data inventory status...");
-        
+
         // First reset local region flags
         await pool.query(`
             UPDATE data_inventory 
@@ -64,8 +64,8 @@ async function cleanDatabase() {
         await pool.query(`
             INSERT INTO users (email, password, role, full_name)
             VALUES 
-                ('admin@aether.local', $1, 'admin', 'System Administrator'),
-                ('user@aether.local', $1, 'user', 'Demo User')
+                ('admin@bisag.predictionengine', $1, 'admin', 'System Administrator'),
+                ('user@bisag.predictionengine', $1, 'user', 'Demo User')
             ON CONFLICT (email) DO NOTHING;
         `, [passwordHash]);
 

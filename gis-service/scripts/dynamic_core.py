@@ -21,6 +21,7 @@ from pathlib import Path
 import psycopg2
 from datetime import timedelta, datetime
 import rasterio.features
+import rasterio.windows
 from shapely.geometry import shape
 
 # ─── Risk class mapping ───────────────────────────────────────────────────────
@@ -246,57 +247,54 @@ def aggregate_lulc(grid_meta: dict, lulc_path: str,
                    disaster_code: str = "landslide", high_res: bool = False) -> np.ndarray:
     """
     Reproject LULC raster onto target grid.
-    If high_res=True, it reprojects from LULC-TIF resolution to Target-TIF resolution.
+    Reads the entire LULC raster and reprojects into destination grid in one pass.
     """
     nrows_out, ncols_out = grid_meta["nrows"], grid_meta["ncols"]
     transform            = grid_meta["transform"]
-
-    # Use a slightly larger tile for high-res
-    TILE = 4000 if high_res else 2000
-    risk_sum   = np.zeros((nrows_out, ncols_out), dtype=np.float32)
-    risk_count = np.zeros((nrows_out, ncols_out), dtype=np.uint8)
+    dst_crs              = grid_meta.get("crs", "EPSG:4326")
 
     with rasterio.open(lulc_path) as src:
         lulc_crs    = src.crs
         lulc_nodata = src.nodata
-        lulc_h, lulc_w = src.height, src.width
+        # Read at reduced resolution to avoid memory issues on large files
+        out_shape = (src.count, min(src.height, nrows_out * 2), min(src.width, ncols_out * 2))
+        lulc_data = src.read(1, out_shape=out_shape[1:], resampling=Resampling.nearest).astype(np.float32)
+        lulc_src_tr = src.transform * src.transform.scale(
+            src.width  / out_shape[2],
+            src.height / out_shape[1]
+        )
+    if lulc_nodata is not None:
+        lulc_data[lulc_data == lulc_nodata] = np.nan
 
-    import rasterio.windows
-    ntil = (lulc_h + TILE - 1) // TILE
-    for ti, r0 in enumerate(range(0, lulc_h, TILE)):
-        r1 = min(r0 + TILE, lulc_h)
-        with rasterio.open(lulc_path) as src:
-            win     = rasterio.windows.Window(0, r0, lulc_w, r1 - r0)
-            tile    = src.read(1, window=win).astype(np.float32)
-            tile_tr = src.window_transform(win)
-        if lulc_nodata is not None:
-            tile[tile == lulc_nodata] = np.nan
+    # Map LULC class → risk weight
+    risk_tile = np.full_like(lulc_data, np.nan)
+    if disaster_code == "flood":
+        infilt = np.full_like(lulc_data, 0.40)
+        rough  = np.full_like(lulc_data, 0.20)
+        for cls, v in LULC_INFILTRATION.items():
+            infilt[lulc_data == cls] = v
+        for cls, v in LULC_ROUGHNESS.items():
+            rough[lulc_data == cls] = v
+        risk_tile = (1.0 - infilt) * 0.6 + (1.0 - rough) * 0.4
+    else:
+        for cls, coeff in LULC_ROOT_RISK.items():
+            risk_tile[lulc_data == cls] = coeff
 
-        # Map LULC class → risk weight
-        risk_tile = np.full_like(tile, np.nan)
-        if disaster_code == "flood":
-            infilt = np.full_like(tile, 0.40)
-            rough  = np.full_like(tile, 0.20)
-            for cls, v in LULC_INFILTRATION.items():
-                infilt[tile == cls] = v
-            for cls, v in LULC_ROUGHNESS.items():
-                rough[tile == cls] = v
-            risk_tile = (1.0 - infilt) * 0.6 + (1.0 - rough) * 0.4
-        else:
-            for cls, coeff in LULC_ROOT_RISK.items():
-                risk_tile[tile == cls] = coeff
+    # Reproject mapped risk tile into destination grid in one shot
+    risk_out = np.full((nrows_out, ncols_out), np.nan, dtype=np.float32)
+    try:
+        reproject(
+            source=risk_tile, destination=risk_out,
+            src_transform=lulc_src_tr, src_crs=lulc_crs,
+            dst_transform=transform, dst_crs=dst_crs,
+            resampling=Resampling.bilinear,
+            src_nodata=np.nan, dst_nodata=np.nan,
+        )
+    except Exception as e:
+        print(f"  [LULC] Reproject warning (using NaN fallback): {e}")
+        return np.full((nrows_out, ncols_out), np.nan, dtype=np.float32)
 
-        tmp = np.full((r1 - r0, lulc_w), np.nan, dtype=np.float32) # Buffer
-        # Reproject this tile directly into the destination grid
-        reproject(source=risk_tile, destination=risk_sum,
-                  src_transform=tile_tr, src_crs=lulc_crs,
-                  dst_transform=transform, dst_crs="EPSG:4326",
-                  resampling=Resampling.bilinear,
-                  init_dest=risk_sum)
-        # Note: simplistic accumulation here, better would be full raster merge
-        # but for LULC average this works okay for now.
-
-    norm = normalize_array(risk_sum)
+    norm = normalize_array(risk_out)
     print(f"  [LULC] mean={np.nanmean(norm):.3f}  max={np.nanmax(norm):.3f}")
     return norm
 
@@ -308,14 +306,22 @@ def aggregate_lulc(grid_meta: dict, lulc_path: str,
 def upsample_array(arr: np.ndarray, src_tr, dest_meta: dict) -> np.ndarray:
     """
     Upsample a 2km raster (arr) to match a high-res grid (dest_meta).
+    Uses the actual CRS from dest_meta instead of hardcoding EPSG:4326.
     """
+    dst_crs = dest_meta.get("crs", "EPSG:4326")
     dest = np.full((dest_meta["nrows"], dest_meta["ncols"]), np.nan, dtype=np.float32)
-    reproject(
-        source=arr, destination=dest,
-        src_transform=src_tr, src_crs="EPSG:4326",
-        dst_transform=dest_meta["transform"], dst_crs="EPSG:4326",
-        resampling=Resampling.bilinear
-    )
+    try:
+        reproject(
+            source=arr, destination=dest,
+            src_transform=src_tr, src_crs="EPSG:4326",
+            dst_transform=dest_meta["transform"], dst_crs=dst_crs,
+            resampling=Resampling.bilinear,
+            src_nodata=np.nan, dst_nodata=np.nan,
+        )
+    except Exception as e:
+        print(f"  [Upsample] Reproject warning (returning 2km grid as-is): {e}")
+        # Return arr as-is — caller will use 2km fallback
+        return arr
     return dest
 
 
@@ -497,19 +503,22 @@ def get_lulc_path_from_db(database_url: str) -> str | None:
 def get_susceptibility_path_from_db(database_url: str,
                                      region_id: str,
                                      disaster_code: str) -> str | None:
-    """Fetch susceptibility TIF path from susceptibility_results table."""
+    """Fetch susceptibility TIF path from susceptibility_results table.
+    Queries the correct column 'disaster_code' (NOT 'disaster_type' which
+    is a foreign key column and will cause a query error).
+    """
     try:
         conn = psycopg2.connect(database_url)
         cur  = conn.cursor()
         cur.execute(
             """
             SELECT tif_path FROM susceptibility_results
-            WHERE region_id = %s 
-              AND (disaster_type = %s OR disaster_type = %s)
+            WHERE region_id = %s
+              AND LOWER(disaster_code) = LOWER(%s)
               AND status = 'done'
             ORDER BY generated_at DESC LIMIT 1
             """,
-            (region_id, disaster_code, disaster_code.lower())
+            (region_id, disaster_code)
         )
         row = cur.fetchone()
         cur.close(); conn.close()
